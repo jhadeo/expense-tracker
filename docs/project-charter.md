@@ -20,6 +20,7 @@ The following features are included in Version 1:
 - Authentication
 - Income management
 - Expense management
+- Category management
 - Reports
 
 ### Out of scope

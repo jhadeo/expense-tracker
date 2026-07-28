@@ -31,6 +31,10 @@ Expense transactions must have:
 Every income and expense transaction shall belong to exactly one registered user.
 
 ### Categories
+The system shall provide a set of default income and expense categories available to all users.
+- Users may create additional personal categories.
+- Default categories cannot be modified or deleted by users. 
+
 Income and expense transactions must belong to a valid category.
 
 ### Dashboard

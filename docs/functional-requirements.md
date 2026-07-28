@@ -55,6 +55,7 @@ The system shall provide users with a summary of their financial activity.
 - View monthly expenses.
 - View recent transactions.
 - View expense summaries.
+- Display charts summarizing financial activity.
 
 ### Business Rules
 - Dashboard data shall be generated from the authenticated user's transactions.
@@ -165,7 +166,6 @@ The system shall generate financial reports based on recorded transactions.
 ### Functional Requirements
 - Generate monthly reports.
 - Generate reports grouped by category.
-- Display charts summarizing financial activity.
 
 ### Inputs
 - Date Range

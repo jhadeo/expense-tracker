@@ -1,0 +1,50 @@
+services:
+  api:
+    container_name: exp-tracker-api
+    build: 
+      context: .
+      dockerfile: docker/php/Dockerfile
+    volumes:
+    - ./api:/var/www/html
+  postgres:
+    container_name: exp-tracker-db
+    image: postgres:17
+    environment:
+      POSTGRES_DB: expense_tracker
+      POSTGRES_USER: laravel
+      POSTGRES_PASSWORD: secret
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+  
+  pgadmin:
+    container_name: exp-tracker-pgadmin
+    image: dpage/pgadmin4:latest
+    depends_on:
+      - postgres
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: secret    
+
+  nginx:
+    container_name: exp-tracker-nginx
+    image: nginx:alpine
+    volumes:
+      - ./api:/var/www/html
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    ports:
+    - "8000:80"
+    depends_on:
+      - api
+
+volumes:
+  postgres_data:
+  pgadmin_data:
+
+
+  

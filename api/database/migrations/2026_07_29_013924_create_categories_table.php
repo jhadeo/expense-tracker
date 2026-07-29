@@ -18,8 +18,9 @@ return new class extends Migration
             $table->string('name');
             $table->enum('type', array_column(CategoryType::cases(), 'value'))
                 ->default(CategoryType::Expenses->value);
-            $table->softDeletes();
             $table->timestamps();
+            $table->softDeletes();
+            $table->unique(['user_id', 'name']);
         });
     }
 

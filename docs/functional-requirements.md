@@ -149,7 +149,8 @@ The system shall allow authenticated users to manage transaction categories.
 ### Validation
 - Category name is required.
 - Category type is required.
-- Category names shall be unique per user and category type.
+- Category names shall be unique per user.
+- A category belongs to exactly one category type (Expense or Income).
 
 ### Business Rules
 - Users may only manage their own categories.

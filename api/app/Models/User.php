@@ -9,8 +9,9 @@ use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['first_name','last_name', 'email', 'password'])]
+#[Fillable(['first_name', 'last_name', 'email', 'password'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -32,7 +33,23 @@ class User extends Authenticatable
 
     protected $appends = ['full_name'];
 
-    public function getFullNameAttribute() : string {
+    public function getFullNameAttribute(): string
+    {
         return trim("{$this->first_name} {$this->last_name}");
+    }
+
+    public function expenses(): HasMany
+    {
+        return $this->hasMany(Expense::class);
+    }
+
+    public function incomes(): HasMany
+    {
+        return $this->hasMany(Income::class);
+    }
+
+    public function categories(): HasMany
+    {
+        return $this->hasMany(Category::class);
     }
 }

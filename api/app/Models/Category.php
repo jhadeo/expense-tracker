@@ -15,5 +15,6 @@ class Category extends Model
     protected function casts(): array
     {
         return ['type' => CategoryType::class];
+        
     }
 }

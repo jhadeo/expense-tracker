@@ -65,6 +65,14 @@ class CategoryController extends Controller
      */
     public function update(UpdateRequest $request, int $id): JsonResponse
     {
+        $cat = Category::findOrFail($id);
+
+        if (is_null($cat->user_id)) {
+            return response()->json([
+                'message' => 'System categories can not be edited.',
+            ], 403);
+        }
+
         $cat = $request->user()->categories()->findOrFail($id);
         $cat->update($request->validated());
 
@@ -103,7 +111,15 @@ class CategoryController extends Controller
      */
     public function restore(Request $request, int $id): JsonResponse
     {
-        $category = $request->user()->categories()->withTrashed()->findOrFail($id);
+        $category = Category::onlyTrashed()->findOrFail($id);
+
+        if (is_null($category->user_id)) {
+            return response()->json([
+                'message' => 'System categories can not restored.',
+            ], 403);
+        }
+
+        $category = $request->user()->categories()->onlyTrashed()->findOrFail($id);
 
         $category->restore();
 

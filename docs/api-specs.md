@@ -219,15 +219,15 @@ None
     "data": [
         {
             "id": 1,
-            "user_id": null,
             "name": "Food",
             "type": "expenses"
+            "is_system": true
         },
         {
             "id": 2,
-            "user_id": 1,
             "name": "Mortgage",
             "type": "expenses"
+            "is_system": false
         }
     ]
 }
@@ -277,9 +277,9 @@ Required.
   "message": "Category created successfully.",
   "data": {
     "id": 1,
-    "user_id": 1,
     "name": "Debt",
     "type": "expenses",
+    "is_system": false
   }
 }
 ```
@@ -333,8 +333,8 @@ Required.
   "message": "Category edited successfully.",
   "data": {
     "id": 1,
-    "user_id": 1,
     "name": "Debt"
+    "is_system": false
   }
 }
 ```
@@ -384,9 +384,9 @@ None
 {
   "data": {
     "id": 1,
-    "user_id": 1,
     "name": "Debt",
-    "type": "expenses"
+    "type": "expenses",
+    "is_system": false
   }
 }
 ```
@@ -433,12 +433,7 @@ None
 
 ```json
 {
-  "data": {
-    "id": 1,
-    "user_id": 1,
-    "name": "Debt",
-    "type": "expenses"
-  }
+  "message": "Category deleted successfully."
 }
 ```
 

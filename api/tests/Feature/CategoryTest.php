@@ -141,6 +141,15 @@ class CategoryTest extends TestCase
         $response->assertNotFound();
     }
 
+    public function test_guest_cannot_view_category(): void
+    {
+        $category = Category::factory()->create();
+
+        $response = $this->getJson("/api/categories/{$category->id}");
+
+        $response->assertUnauthorized();
+    }
+
     public function test_user_can_update_category(): void
     {
         $user = User::factory()->create();
@@ -148,7 +157,7 @@ class CategoryTest extends TestCase
 
         $cat = Category::factory()->for($user)->create();
 
-        $response = $this->putJson("/api/categories/{$cat->id}", [
+        $response = $this->patchJson("/api/categories/{$cat->id}", [
             'name' => 'test'
         ]);
 
@@ -170,7 +179,7 @@ class CategoryTest extends TestCase
         $cat = Category::factory()->for($user)->create();
         Category::factory()->for($other)->create(['name' => 'test']);
 
-        $response = $this->putJson("/api/categories/{$cat->id}", [
+        $response = $this->patchJson("/api/categories/{$cat->id}", [
             'name' => 'test'
         ]);
 
@@ -196,7 +205,7 @@ class CategoryTest extends TestCase
 
         $cat = Category::factory()->for($other)->create();
 
-        $response = $this->putJson("/api/categories/{$cat->id}", [
+        $response = $this->patchJson("/api/categories/{$cat->id}", [
             'name' => 'test'
         ]);
 
@@ -212,7 +221,7 @@ class CategoryTest extends TestCase
 
         $cat = Category::factory()->create(['user_id' => null]);
 
-        $response = $this->putJson("/api/categories/{$cat->id}", [
+        $response = $this->patchJson("/api/categories/{$cat->id}", [
             'name' => 'test'
         ]);
 
@@ -228,7 +237,7 @@ class CategoryTest extends TestCase
         $cat = Category::factory()->for($user)->create();
         Category::factory()->for($user)->create(['name' => 'test']);
 
-        $response = $this->putJson("/api/categories/{$cat->id}", [
+        $response = $this->patchJson("/api/categories/{$cat->id}", [
             'name' => 'test'
         ]);
 
@@ -291,7 +300,7 @@ class CategoryTest extends TestCase
 
         $category->delete();
 
-        $response = $this->patchJson("/api/categories/{$category->id}");
+        $response = $this->putJson("/api/categories/{$category->id}/restore");
 
         $response->assertOk();
 
@@ -313,7 +322,7 @@ class CategoryTest extends TestCase
 
         $category->delete();
 
-        $response = $this->patchJson("/api/categories/{$category->id}");
+        $response = $this->putJson("/api/categories/{$category->id}/restore");
 
         $response->assertForbidden();
     }
@@ -329,7 +338,20 @@ class CategoryTest extends TestCase
 
         $category->delete();
 
-        $response = $this->patchJson("/api/categories/{$category->id}");
+        $response = $this->putJson("/api/categories/{$category->id}/restore");
+
+        $response->assertNotFound();
+    }
+
+    public function test_user_cannot_restore_active_category(): void
+    {
+        $user = User::factory()->create();
+
+        Sanctum::actingAs($user);
+
+        $category = Category::factory()->for($user)->create();
+
+        $response = $this->putJson("/api/categories/{$category->id}/restore");
 
         $response->assertNotFound();
     }

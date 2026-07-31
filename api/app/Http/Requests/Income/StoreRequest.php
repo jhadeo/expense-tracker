@@ -34,7 +34,8 @@ class StoreRequest extends FormRequest
                         $query->where('user_id', $this->user()->id)
                             ->orWhereNull('user_id');
                     })
-                    ->where('type', CategoryType::Income),
+                    ->where('type', CategoryType::Income)
+                    ->whereNull('deleted_at'),
             ],
             'date' => ['required', 'date']
         ];

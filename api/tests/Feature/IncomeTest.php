@@ -246,7 +246,8 @@ class IncomeTest extends TestCase
 
         $user = User::factory()->create();
 
-        $cat = Category::factory()->for($user)->create(['type' => 'income', 'user_id' => null]);
+        $cat = Category::factory()->create(['type' => 'income', 'user_id' => null]);
+        $this->assertNull($cat->user_id);
         $inc = Income::factory()->for($user)->create(['category_id' => $cat->id]);
 
         Sanctum::actingAs($user);
@@ -400,5 +401,138 @@ class IncomeTest extends TestCase
         ]);
 
         $response->assertUnauthorized();
+    }
+
+    public function test_user_can_view_own_income()
+    {
+        $user = User::factory()->create();
+        Sanctum::actingAs($user);
+
+        $cat = Category::factory()->for($user)->create(['type' => 'income']);
+        $inc = Income::factory()->for($user)->create(['category_id' => $cat->id]);
+
+        $response = $this->getJson("/api/incomes/{$inc->id}");
+
+        $response->assertOk();
+
+        $response->assertJson([
+            'data' => [
+                'id' => $inc->id,
+                'title' => $inc->title,
+                'amount' => $inc->amount,
+                'category_id' => $inc->category_id,
+                'date' => $inc->date->toDateString()
+            ]
+        ]);
+    }
+
+    public function test_guest_cannot_view_income()
+    {
+        $user = User::factory()->create();
+
+        $cat = Category::factory()->for($user)->create(['type' => 'income']);
+        $inc = Income::factory()->for($user)->create(['category_id' => $cat->id]);
+
+        $response = $this->getJson("/api/incomes/{$inc->id}");
+
+        $response->assertUnauthorized();
+    }
+
+    public function test_user_cannot_view_others_income()
+    {
+        $user = User::factory()->create();
+        $other = User::factory()->create();
+        Sanctum::actingAs($user);
+
+        $cat = Category::factory()->for($other)->create(['type' => 'income']);
+        $inc = Income::factory()->for($other)->create(['category_id' => $cat->id]);
+
+        $response = $this->getJson("/api/incomes/{$inc->id}");
+
+        $response->assertNotFound();
+    }
+
+    public function test_user_can_delete_income(): void
+    {
+        $user = User::factory()->create();
+
+        Sanctum::actingAs($user);
+
+        $cat = Category::factory()->for($user)->create(['type' => 'income']);
+        $inc = Income::factory()->for($user)->create(['category_id' => $cat->id]);
+
+        $response = $this->deleteJson("/api/incomes/{$inc->id}");
+
+        $response->assertOk();
+
+        $this->assertSoftDeleted('incomes', [
+            'id' => $inc->id,
+        ]);
+    }
+
+    public function test_user_cannot_delete_others_income(): void
+    {
+        $user = User::factory()->create();
+        $other = User::factory()->create();
+        Sanctum::actingAs($user);
+
+        $cat = Category::factory()->for($other)->create(['type' => 'income']);
+        $inc = Income::factory()->for($other)->create(['category_id' => $cat->id]);
+
+        $response = $this->deleteJson("/api/incomes/{$inc->id}");
+
+        $response->assertNotFound();
+    }
+
+    public function test_user_can_restore_income(): void
+    {
+        $user = User::factory()->create();
+
+        Sanctum::actingAs($user);
+
+        $cat = Category::factory()->for($user)->create(['type' => 'income']);
+        $inc = Income::factory()->for($user)->create(['category_id' => $cat->id]);
+        $inc->delete();
+
+        $response = $this->patchJson("/api/incomes/{$inc->id}/restore");
+
+        $response->assertOk();
+
+        $this->assertDatabaseHas('incomes', [
+            'id' => $inc->id,
+            'deleted_at' => null,
+        ]);
+    }
+
+    public function test_user_cannot_restore_others_income(): void
+    {
+        $user = User::factory()->create();
+        $other = User::factory()->create();
+
+        Sanctum::actingAs($user);
+
+
+        $cat = Category::factory()->for($other)->create(['type' => 'income']);
+        $inc = Income::factory()->for($other)->create(['category_id' => $cat->id]);
+
+        $inc->delete();
+
+        $response = $this->patchJson("/api/incomes/{$inc->id}/restore");
+
+        $response->assertNotFound();
+    }
+
+    public function test_user_cannot_restore_active_category(): void
+    {
+        $user = User::factory()->create();
+
+        Sanctum::actingAs($user);
+
+        $cat = Category::factory()->for($user)->create(['type' => 'income']);
+        $inc = Income::factory()->for($user)->create(['category_id' => $cat->id]);
+
+        $response = $this->patchJson("/api/incomes/{$inc->id}/restore");
+
+        $response->assertNotFound();
     }
 }

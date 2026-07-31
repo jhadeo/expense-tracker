@@ -39,15 +39,19 @@ class IncomeController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Income $income)
+    public function show(Request $request, int $id): JsonResponse
     {
-        //
+        $inc = $request->user()->incomes()->findOrFail($id);
+
+        return response()->json([
+            'data' => new IncomeResource($inc)
+        ], 200);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateRequest $request, int $id)
+    public function update(UpdateRequest $request, int $id): JsonResponse
     {
         $inc =  $request->user()->incomes()->findOrFail($id);
         $inc->update($request->validated());
@@ -58,11 +62,29 @@ class IncomeController extends Controller
         ], 200);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Income $income)
+    public function destroy(Request $request, int $id): JsonResponse
     {
-        //
+        $inc =  $request->user()->incomes()->findOrFail($id);
+
+        $inc->delete();
+
+        return response()->json([
+            'message' => 'Income deleted successfully.',
+        ]);
+    }
+
+    /**
+     * Restore the specified resource from storage.
+     */
+    public function restore(Request $request, int $id): JsonResponse
+    {
+
+        $inc = $request->user()->incomes()->onlyTrashed()->findOrFail($id);
+
+        $inc->restore();
+
+        return response()->json([
+            'message' => 'Income restored successfully.',
+        ]);
     }
 }

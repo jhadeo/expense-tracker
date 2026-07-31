@@ -215,4 +215,190 @@ class IncomeTest extends TestCase
 
         $response->assertUnprocessable();
     }
+
+    public function test_user_can_update_income_using_own_category()
+    {
+
+        $user = User::factory()->create();
+
+        $cat = Category::factory()->for($user)->create(['type' => 'income']);
+        $inc = Income::factory()->for($user)->create(['category_id' => $cat->id]);
+
+        Sanctum::actingAs($user);
+
+        $response = $this->patchJson("/api/incomes/{$inc->id}", [
+            'title' => 'Salary',
+            'amount' => 1000,
+            'category_id' => $inc->category_id,
+            'date' => '2026-07-28',
+        ]);
+
+        $response->assertOk()->assertJsonFragment([
+            'title' => 'Salary',
+            'amount' => "1000.00",
+            'category_id' => $inc->category_id,
+            'date' => '2026-07-28',
+        ]);
+    }
+
+    public function test_user_can_update_income_using_system_category()
+    {
+
+        $user = User::factory()->create();
+
+        $cat = Category::factory()->for($user)->create(['type' => 'income', 'user_id' => null]);
+        $inc = Income::factory()->for($user)->create(['category_id' => $cat->id]);
+
+        Sanctum::actingAs($user);
+
+        $response = $this->patchJson("/api/incomes/{$inc->id}", [
+            'title' => 'Salary',
+            'amount' => 1000,
+            'category_id' => $inc->category_id,
+            'date' => '2026-07-28',
+        ]);
+
+        $response->assertOk()->assertJsonFragment([
+            'title' => 'Salary',
+            'amount' => "1000.00",
+            'category_id' => $inc->category_id,
+            'date' => '2026-07-28',
+        ]);
+    }
+    public function test_user_can_partially_update_income(): void
+    {
+        $user = User::factory()->create();
+
+        $cat = Category::factory()->for($user)->create([
+            'type' => 'income',
+        ]);
+
+        $inc = Income::factory()->for($user)->create([
+            'title' => 'Old Title',
+            'category_id' => $cat->id,
+        ]);
+
+        Sanctum::actingAs($user);
+
+        $response = $this->patchJson("/api/incomes/{$inc->id}", [
+            'title' => 'New Title',
+        ]);
+
+        $response->assertOk();
+
+        $this->assertDatabaseHas('incomes', [
+            'id' => $inc->id,
+            'title' => 'New Title',
+            'category_id' => $cat->id,
+        ]);
+    }
+
+    public function test_user_cannot_update_others_income(): void
+    {
+        $user = User::factory()->create();
+        $other = User::factory()->create();
+
+        $cat = Category::factory()->for($user)->create([
+            'type' => 'income',
+        ]);
+
+        $otherCat = Category::factory()->for($other)->create([
+            'type' => 'income',
+        ]);
+
+        $inc = Income::factory()->for($other)->create([
+            'category_id' => $otherCat->id,
+        ]);
+
+        Sanctum::actingAs($user);
+
+        $response = $this->patchJson("/api/incomes/{$inc->id}", [
+            'title' => 'Salary',
+            'amount' => 1000,
+            'category_id' => $cat->id,
+            'date' => '2026-07-28',
+        ]);
+
+        $response->assertNotFound();
+    }
+
+    public function test_user_cannot_update_own_income_using_others_category(): void
+    {
+        $user = User::factory()->create();
+        $other = User::factory()->create();
+
+        $cat = Category::factory()->for($user)->create(['type' => 'income']);
+        $otherCat = Category::factory()->for($other)->create(['type' => 'income']);
+
+        $inc = Income::factory()->for($user)->create([
+            'category_id' => $cat->id,
+        ]);
+
+        Sanctum::actingAs($user);
+
+        $response = $this->patchJson("/api/incomes/{$inc->id}", [
+            'title' => 'Salary',
+            'amount' => 1000,
+            'category_id' => $otherCat->id,
+            'date' => '2026-07-28',
+        ]);
+
+        $response->assertUnprocessable();
+    }
+
+    public function test_user_cannot_update_own_income_using_invalid_category(): void
+    {
+        $user = User::factory()->create();
+
+        $cat = Category::factory()->for($user)->create(['type' => 'income']);
+
+        $inc = Income::factory()->for($user)->create([
+            'category_id' => $cat->id,
+        ]);
+
+        Sanctum::actingAs($user);
+
+        $response = $this->patchJson("/api/incomes/{$inc->id}", [
+            'category_id' => 99, //invalid
+        ]);
+
+        $response->assertUnprocessable();
+    }
+
+    public function test_user_cannot_update_own_income_using_invalid_date(): void
+    {
+        $user = User::factory()->create();
+
+        $cat = Category::factory()->for($user)->create(['type' => 'income']);
+
+        $inc = Income::factory()->for($user)->create([
+            'category_id' => $cat->id,
+        ]);
+
+        Sanctum::actingAs($user);
+
+        $response = $this->patchJson("/api/incomes/{$inc->id}", [
+            'date' => 99, //invalid
+        ]);
+
+        $response->assertUnprocessable();
+    }
+
+    public function test_guest_cannot_update_income()
+    {
+
+        $user = User::factory()->create();
+
+        $cat = Category::factory()->for($user)->create(['type' => 'income']);
+        $inc = Income::factory()->for($user)->create(['category_id' => $cat->id]);
+
+        $response = $this->patchJson("/api/incomes/{$inc->id}", [
+            'title' => 'Salary',
+            'amount' => 1000,
+            'category_id' => $inc->category_id,
+            'date' => '2026-07-28',
+        ]);
+
+        $response->assertUnauthorized();
+    }
 }

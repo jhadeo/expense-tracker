@@ -13,7 +13,7 @@ class UpdateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -24,10 +24,10 @@ class UpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => ['required', 'string', 'max:255'],
-            'amount' => ['required', 'numeric', 'min:1'],
+            'title' => ['sometimes', 'string', 'max:255'],
+            'amount' => ['sometimes', 'numeric', 'min:1'],
             'category_id' => [
-                'required',
+                'sometimes',
                 Rule::exists('categories', 'id')
                     ->where(function ($query) {
                         $query->where('user_id', $this->user()->id)
@@ -35,7 +35,7 @@ class UpdateRequest extends FormRequest
                     })
                     ->where('type', CategoryType::Income),
             ],
-            'date' => ['required', 'date']
+            'date' => ['sometimes', 'date']
         ];
     }
 }

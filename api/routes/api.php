@@ -24,6 +24,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::name('income.')->prefix('incomes')->group(function () {
         Route::get('/', [IncomeController::class, 'index']);
-        Route::post('/',[IncomeController::class, 'store']);
+        Route::post('/', [IncomeController::class, 'store']);
+        Route::patch('/{id}', [IncomeController::class, 'update']);
     });
 });

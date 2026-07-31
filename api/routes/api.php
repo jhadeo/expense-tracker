@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\Api\IncomeController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -19,5 +20,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/{id}', [CategoryController::class, 'show']);
         Route::delete('/{id}', [CategoryController::class, 'destroy']);
         Route::patch('/{id}', [CategoryController::class, 'restore']);
+    });
+
+    Route::name('income.')->prefix('incomes')->group(function () {
+        Route::get('/', [IncomeController::class, 'index']);
+        Route::post('/',[IncomeController::class, 'store']);
     });
 });

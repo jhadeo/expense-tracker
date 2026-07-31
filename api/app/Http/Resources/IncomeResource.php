@@ -19,7 +19,7 @@ class IncomeResource extends JsonResource
             'title' => $this->title,
             'amount' => $this->amount,
             'category_id' => $this->category_id,
-            'date' => $this->date
+            'date' => $this->date->toDateString()
         ];
     }
 }

@@ -3,23 +3,20 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Income\StoreRequest;
-use App\Http\Requests\Income\UpdateRequest;
-use App\Http\Resources\IncomeResource;
+use App\Http\Requests\Expense\StoreRequest;
+use App\Http\Requests\Expense\UpdateRequest;
+use App\Http\Resources\ExpenseResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
-class IncomeController extends Controller
+class ExpenseController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index(Request $request): JsonResponse
     {
-        $inc = $request->user()->incomes;
+        $exp = $request->user()->expenses;
 
         return response()->json([
-            'data' => IncomeResource::collection($inc)
+            'data' => ExpenseResource::collection($exp)
         ], 200);
     }
 
@@ -28,10 +25,10 @@ class IncomeController extends Controller
      */
     public function store(StoreRequest $request): JsonResponse
     {
-        $inc = $request->user()->incomes()->create($request->validated());
+        $exp = $request->user()->expenses()->create($request->validated());
         return response()->json([
-            'message' => 'Income created successfully.',
-            'data' => new IncomeResource($inc)
+            'message' => 'Expense created successfully.',
+            'data' => new ExpenseResource($exp)
         ], 201);
     }
 
@@ -40,10 +37,10 @@ class IncomeController extends Controller
      */
     public function show(Request $request, int $id): JsonResponse
     {
-        $inc = $request->user()->incomes()->findOrFail($id);
+        $exp = $request->user()->expenses()->findOrFail($id);
 
         return response()->json([
-            'data' => new IncomeResource($inc)
+            'data' => new ExpenseResource($exp)
         ], 200);
     }
 
@@ -52,23 +49,23 @@ class IncomeController extends Controller
      */
     public function update(UpdateRequest $request, int $id): JsonResponse
     {
-        $inc =  $request->user()->incomes()->findOrFail($id);
-        $inc->update($request->validated());
+        $exp =  $request->user()->expenses()->findOrFail($id);
+        $exp->update($request->validated());
 
         return response()->json([
-            'message' => 'Income updated successfully.',
-            'data' => new IncomeResource($inc),
+            'message' => 'Expense updated successfully.',
+            'data' => new ExpenseResource($exp),
         ], 200);
     }
 
     public function destroy(Request $request, int $id): JsonResponse
     {
-        $inc =  $request->user()->incomes()->findOrFail($id);
+        $exp =  $request->user()->expenses()->findOrFail($id);
 
-        $inc->delete();
+        $exp->delete();
 
         return response()->json([
-            'message' => 'Income deleted successfully.',
+            'message' => 'Expense deleted successfully.',
         ]);
     }
 
@@ -78,12 +75,12 @@ class IncomeController extends Controller
     public function restore(Request $request, int $id): JsonResponse
     {
 
-        $inc = $request->user()->incomes()->onlyTrashed()->findOrFail($id);
+        $exp = $request->user()->expenses()->onlyTrashed()->findOrFail($id);
 
-        $inc->restore();
+        $exp->restore();
 
         return response()->json([
-            'message' => 'Income restored successfully.',
+            'message' => 'Expense restored successfully.',
         ]);
     }
 }

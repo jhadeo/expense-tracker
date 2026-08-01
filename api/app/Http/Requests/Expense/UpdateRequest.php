@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Http\Requests\Income;
+namespace App\Http\Requests\Expense;
 
+use App\Enums\CategoryType;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
-use App\Enums\CategoryType;
+
 class UpdateRequest extends FormRequest
 {
     /**
@@ -33,10 +34,11 @@ class UpdateRequest extends FormRequest
                         $query->where('user_id', $this->user()->id)
                             ->orWhereNull('user_id');
                     })
-                    ->where('type', CategoryType::Income)
+                    ->where('type', CategoryType::Expenses)
                     ->whereNull('deleted_at'),
             ],
             'date' => ['sometimes', 'date']
         ];
+
     }
 }

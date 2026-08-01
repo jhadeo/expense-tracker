@@ -2,8 +2,10 @@
 
 namespace App\Http\Requests\Expense;
 
+use App\Enums\CategoryType;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateRequest extends FormRequest
 {
@@ -12,7 +14,7 @@ class UpdateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -23,7 +25,20 @@ class UpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'title' => ['sometimes', 'string', 'max:255'],
+            'amount' => ['sometimes', 'numeric', 'min:1'],
+            'category_id' => [
+                'sometimes',
+                Rule::exists('categories', 'id')
+                    ->where(function ($query) {
+                        $query->where('user_id', $this->user()->id)
+                            ->orWhereNull('user_id');
+                    })
+                    ->where('type', CategoryType::Expenses)
+                    ->whereNull('deleted_at'),
+            ],
+            'date' => ['sometimes', 'date']
         ];
+
     }
 }

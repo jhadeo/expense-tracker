@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Income\StoreRequest;
 use App\Http\Requests\Income\UpdateRequest;
 use App\Http\Resources\IncomeResource;
-use App\Models\Income;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 

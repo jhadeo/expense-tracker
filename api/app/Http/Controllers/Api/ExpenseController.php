@@ -3,9 +3,84 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Expense\StoreRequest;
+use App\Http\Requests\Expense\UpdateRequest;
+use App\Http\Resources\ExpenseResource;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class ExpenseController extends Controller
 {
-    //
+    public function index(Request $request): JsonResponse
+    {
+        $exp = $request->user()->expenses;
+
+        return response()->json([
+            'data' => ExpenseResource::collection($exp)
+        ], 200);
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(StoreRequest $request): JsonResponse
+    {
+        $exp = $request->user()->expenses()->create($request->validated());
+        return response()->json([
+            'message' => 'Expense created successfully.',
+            'data' => new ExpenseResource($exp)
+        ], 201);
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(Request $request, int $id): JsonResponse
+    {
+        $exp = $request->user()->expenses()->findOrFail($id);
+
+        return response()->json([
+            'data' => new ExpenseResource($exp)
+        ], 200);
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(UpdateRequest $request, int $id): JsonResponse
+    {
+        $exp =  $request->user()->expenses()->findOrFail($id);
+        $exp->update($request->validated());
+
+        return response()->json([
+            'message' => 'Expense updated successfully.',
+            'data' => new ExpenseResource($exp),
+        ], 200);
+    }
+
+    public function destroy(Request $request, int $id): JsonResponse
+    {
+        $exp =  $request->user()->expenses()->findOrFail($id);
+
+        $exp->delete();
+
+        return response()->json([
+            'message' => 'Expense deleted successfully.',
+        ]);
+    }
+
+    /**
+     * Restore the specified resource from storage.
+     */
+    public function restore(Request $request, int $id): JsonResponse
+    {
+
+        $exp = $request->user()->expenses()->onlyTrashed()->findOrFail($id);
+
+        $exp->restore();
+
+        return response()->json([
+            'message' => 'Expense restored successfully.',
+        ]);
+    }
 }

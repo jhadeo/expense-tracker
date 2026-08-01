@@ -5,10 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Category;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 #[Fillable('title', 'user_id', 'category_id', 'amount', 'date')]
 class Expense extends Model
 {
+    use SoftDeletes, HasFactory;
     protected function casts(): array
     {
         return [

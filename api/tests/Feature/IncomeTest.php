@@ -522,7 +522,7 @@ class IncomeTest extends TestCase
         $response->assertNotFound();
     }
 
-    public function test_user_cannot_restore_active_category(): void
+    public function test_user_cannot_restore_active_income(): void
     {
         $user = User::factory()->create();
 

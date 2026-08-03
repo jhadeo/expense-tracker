@@ -211,7 +211,7 @@ class DashboardTest extends TestCase
 
         $response->assertOk();
 
-        $this->assertCount(1, $response->json('data.recent_incomes'));
+        $this->assertCount(1, $response->json('data.recent_expenses'));
 
         $this->assertEquals([
             [

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\ExpenseController;
 use App\Http\Controllers\Api\IncomeController;
 use Illuminate\Support\Facades\Route;
@@ -41,4 +42,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::patch('/{id}/restore', [ExpenseController::class, 'restore']);
 
     });
+
+    Route::get('/dashboard', [DashboardController::class,'index']);
 });

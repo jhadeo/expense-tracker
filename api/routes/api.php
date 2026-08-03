@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\ExpenseController;
 use App\Http\Controllers\Api\IncomeController;
+use App\Http\Controllers\Api\ReportController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -40,8 +41,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::patch('/{id}', [ExpenseController::class, 'update']);
         Route::delete('/{id}', [ExpenseController::class, 'destroy']);
         Route::patch('/{id}/restore', [ExpenseController::class, 'restore']);
-
     });
 
-    Route::get('/dashboard', [DashboardController::class,'index']);
+    Route::get('/dashboard', [DashboardController::class, 'index']);
+
+    Route::name('report.')->prefix('reports')->group(function () {
+        Route::get('/monthly',[ReportController::class,'index_monthly']);
+        Route::get('/category',[ReportController::class,'index_category']);
+    });
 });

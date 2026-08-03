@@ -8,18 +8,17 @@ use App\Http\Requests\Reports\CategoryReportRequest;
 use App\Http\Requests\Reports\ReportMonthlyRequest;
 use App\Models\Category;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 class ReportController extends Controller
 {
     public function index_category(CategoryReportRequest $request): JsonResponse
     {
-        $category = Category::where('id', $request->validated('category_id'))
+        $category = Category::where('id', $request->validated('id'))
             ->where(function ($query) use ($request) {
                 $query->whereNull('user_id')
                     ->orWhereBelongsTo($request->user());
             })
-            ->first();
+            ->firstOrFail();
 
         $relationship = match ($category->type) {
             CategoryType::Expenses => 'expenses',

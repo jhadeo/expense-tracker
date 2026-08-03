@@ -23,10 +23,10 @@ class CategoryReportRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'category_id' => ['required', 'integer', 'exists:categories,id'],
+            'id' => ['required', 'integer', 'exists:categories,id'],
 
             'month' => ['nullable', 'integer', 'between:1,12', 'required_with:year'],
-            'year' => ['nullable', 'digits:4', 'required_with:year'],
+            'year' => ['nullable', 'digits:4', 'required_with:month'],
 
             'start_date' => ['nullable', 'date'],
             'end_date' => ['nullable', 'date', 'after_or_equal:start_date'],

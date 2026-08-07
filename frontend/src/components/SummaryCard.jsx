@@ -8,7 +8,7 @@ export function SummaryCard({ title, amount, color }) {
       </CardHeader>
 
       <CardContent>
-        <p className={`text-xl md:text-3xl font-bold ${color}`}>₱ {amount}</p>
+        <p className={`text-xl md:text-3xl font-bold ${color}`}>₱{amount}</p>
       </CardContent>
     </Card>
   );

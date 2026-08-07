@@ -30,7 +30,7 @@ export function TableCard({ title, rows }) {
                 <TableCell className="font-medium text-center">
                   {row?.title}
                 </TableCell>
-                <TableCell className="text-center">{row?.amount}</TableCell>
+                <TableCell className="text-center">₱{row?.amount}</TableCell>
                 <TableCell className="text-center">
                   {row?.date
                     ? new Date(row.date).toLocaleString("en-US", {

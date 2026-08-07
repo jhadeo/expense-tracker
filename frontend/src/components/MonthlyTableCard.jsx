@@ -38,7 +38,7 @@ export function MonthlyTableCard({ title, rows }) {
                 <TableCell
                   className={`text-center ${row?.income - row?.expenses < 0 ? "text-red-600" : "text-green-600"}`}
                 >
-                  {row?.income - row?.expenses}
+                  ₱{row?.income - row?.expenses}
                 </TableCell>
               </TableRow>
             ))}

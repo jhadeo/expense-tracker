@@ -1,9 +1,11 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
 
 export function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -13,8 +15,7 @@ export function Login() {
         password,
       });
       localStorage.setItem("token", response.data.token);
-      const expenses = await api.get("/expenses");
-      console.log(expenses);
+      navigate("/dashboard");
     } catch (error) {
       console.error(error);
     }

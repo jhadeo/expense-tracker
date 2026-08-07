@@ -2,7 +2,8 @@ import { Login } from "./pages/Login";
 import { Dashboard } from "./pages/Dashboard";
 import { Expenses } from "./pages/Expenses";
 import { Routes, Route, Navigate } from "react-router-dom";
-import  ProtectedRoute  from "./components/ProtectedRoute";
+import AuthLayout from "./layouts/AuthLayout";
+import ProtectedRoute from "./components/ProtectedRoute";
 import "./index.css";
 
 function App() {
@@ -10,22 +11,15 @@ function App() {
     <Routes>
       <Route path="/" element={<Navigate to="/login" replace />} />
       <Route path="/login" element={<Login />}></Route>
-      <Route
-        path="/dashboard"
-        element={
-          <ProtectedRoute>
-            <Dashboard />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/expenses"
-        element={
-          <ProtectedRoute>
-            <Expenses />
-          </ProtectedRoute>
-        }
-      />
+
+      <Route element={<ProtectedRoute/>}>
+        <Route element={<AuthLayout/>}>
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/expenses" element={<Expenses />} />
+        </Route>
+      </Route>
+
+      <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>
   );
 }

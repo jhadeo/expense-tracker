@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { SummaryCard } from "@/components/SummaryCard";
 import { TableCard } from "@/components/TableCard";
 import { MonthlyTableCard } from "@/components/MonthlyTableCard";
+import { QuickActions } from "@/components/QuickActions";
 
 import api from "../api/axios";
 
@@ -28,6 +29,10 @@ export function Dashboard() {
   }
   return (
     <div className="p-4 flex flex-col md:grid md:grid-cols-3 gap-4">
+      <div className="col-span-3">
+        <QuickActions></QuickActions>
+      </div>
+
       <SummaryCard
         title="Your Balance"
         amount={data?.balance}
@@ -44,7 +49,10 @@ export function Dashboard() {
         color="text-red-600"
       />
       <div className="row-span-2">
-        <MonthlyTableCard title={"Monthly Summary"} rows={data?.monthly_summary} />
+        <MonthlyTableCard
+          title={"Monthly Summary"}
+          rows={data?.monthly_summary}
+        />
       </div>
       <div className="col-span-2">
         <TableCard title={"Recent Incomes"} rows={data?.recent_incomes} />

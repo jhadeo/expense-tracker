@@ -29,9 +29,7 @@ export function Dashboard() {
   }
   return (
     <div className="p-4 flex flex-col md:grid md:grid-cols-3 gap-4">
-      <div className="col-span-3">
-        <QuickActions></QuickActions>
-      </div>
+      <QuickActions className={"col-span-3 h-full"}></QuickActions>
 
       <SummaryCard
         title="Your Balance"
@@ -48,18 +46,23 @@ export function Dashboard() {
         amount={data?.total_expenses}
         color="text-red-600"
       />
-      <div className="row-span-2">
-        <MonthlyTableCard
-          title={"Monthly Summary"}
-          rows={data?.monthly_summary}
-        />
-      </div>
-      <div className="col-span-2">
-        <TableCard title={"Recent Incomes"} rows={data?.recent_incomes} />
-      </div>
-      <div className="col-span-2">
-        <TableCard title={"Recent Expenses"} rows={data?.recent_expenses} />
-      </div>
+
+      <MonthlyTableCard
+        title={"Monthly Summary"}
+        rows={data?.monthly_summary}
+        className="row-span-2"
+      />
+
+      <TableCard
+        title={"Recent Incomes"}
+        rows={data?.recent_incomes}
+        className="col-span-2"
+      />
+      <TableCard
+        title={"Recent Expenses"}
+        rows={data?.recent_expenses}
+        className="col-span-2"
+      />
     </div>
   );
 }

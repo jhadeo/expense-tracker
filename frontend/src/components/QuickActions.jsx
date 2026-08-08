@@ -2,9 +2,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "./ui/button";
 import { ButtonGroup } from "./ui/button-group";
 
-export function QuickActions() {
+export function QuickActions({className}) {
   return (
-    <Card className={"h-full"}>
+    <Card className={className}>
       <CardHeader>
         <CardTitle>Quick Actions</CardTitle>
       </CardHeader>

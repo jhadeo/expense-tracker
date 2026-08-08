@@ -8,9 +8,9 @@ import {
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-export function TableCard({ title, rows }) {
+export function TableCard({ title, rows, className }) {
   return (
-    <Card className={"h-full"}>
+    <Card className={className}>
       <CardHeader>
         <CardTitle>{title}</CardTitle>
       </CardHeader>

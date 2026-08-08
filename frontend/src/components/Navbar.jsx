@@ -25,20 +25,20 @@ export default function Navbar() {
     }
   }
   return (
-    <div className="w-full h-full p-4 flex justify-center items-center sticky shadow-md">
+    <div className="w-full h-full p-4 flex justify-center items-center sticky">
       <NavigationMenu>
         <NavigationMenuList>
           <NavigationMenuItem>
-            <NavigationMenuLink>
-              <Link to={"/dashboard"}>Dashboard</Link>
+            <NavigationMenuLink render={<Link to={"/dashboard"} />}>
+              Dashboard
             </NavigationMenuLink>
           </NavigationMenuItem>
 
           <NavigationMenuItem>
             <NavigationMenuTrigger>Income</NavigationMenuTrigger>
             <NavigationMenuContent>
-              <NavigationMenuLink >
-                <Link to={"/incomes"}>View Income</Link>
+              <NavigationMenuLink render={<Link to={"/incomes"} />}>
+                View Incomes
               </NavigationMenuLink>
             </NavigationMenuContent>
           </NavigationMenuItem>
@@ -46,8 +46,8 @@ export default function Navbar() {
           <NavigationMenuItem>
             <NavigationMenuTrigger>Expenses</NavigationMenuTrigger>
             <NavigationMenuContent>
-              <NavigationMenuLink >
-                <Link to={"/expenses"}>View Expenses</Link>
+              <NavigationMenuLink render={<Link to={"/expenses"} />}>
+                View Expenses
               </NavigationMenuLink>
             </NavigationMenuContent>
           </NavigationMenuItem>

@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-export function TableCard({ title, rows, className }) {
+export function TableCard({ title, rows, className, headers }) {
   return (
     <Card className={className}>
       <CardHeader>
@@ -19,27 +19,21 @@ export function TableCard({ title, rows, className }) {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="text-center">Title</TableHead>
-              <TableHead className="text-center">Amount</TableHead>
-              <TableHead className="text-center">Date</TableHead>
+              {headers.map((header) => (
+                <TableHead className="text-center" key={header.key}>
+                  {header.label}
+                </TableHead>
+              ))}
             </TableRow>
           </TableHeader>
           <TableBody>
             {rows.map((row) => (
               <TableRow key={row.id}>
-                <TableCell className="font-medium text-center">
-                  {row?.title}
-                </TableCell>
-                <TableCell className="text-center">₱{row?.amount}</TableCell>
-                <TableCell className="text-center">
-                  {row?.date
-                    ? new Date(row.date).toLocaleString("en-US", {
-                        month: "2-digit",
-                        day: "2-digit",
-                        year: "2-digit",
-                      })
-                    : ""}
-                </TableCell>
+                {headers.map((header) => (
+                  <TableCell key={header.key} className="text-center">
+                    {header.render ? header.render(row) : row[header.key]}
+                  </TableCell>
+                ))}
               </TableRow>
             ))}
           </TableBody>

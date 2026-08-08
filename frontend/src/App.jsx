@@ -1,6 +1,7 @@
 import { Login } from "./pages/Login";
 import { Dashboard } from "./pages/Dashboard";
 import { Expenses } from "./pages/Expenses";
+import { Incomes } from "./pages/Incomes";
 import { Routes, Route, Navigate } from "react-router-dom";
 import AuthLayout from "./layouts/AuthLayout";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -16,6 +17,7 @@ function App() {
         <Route element={<AuthLayout/>}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/expenses" element={<Expenses />} />
+          <Route path="/incomes" element={<Incomes />} />
         </Route>
       </Route>
 

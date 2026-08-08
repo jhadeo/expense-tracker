@@ -18,7 +18,7 @@ class DashboardController extends Controller
         $total_income = $request->user()->incomes()->sum('amount');
         $total_expense = $request->user()->expenses()->sum('amount');
 
-        $balance = $total_income - $total_expense;
+        $balance = number_format(($total_income - $total_expense), 2, '.' ,'');
 
         $recent_incomes = $request->user()
             ->incomes()

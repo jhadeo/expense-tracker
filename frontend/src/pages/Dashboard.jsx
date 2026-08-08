@@ -71,7 +71,7 @@ export function Dashboard() {
   ];
 
   return (
-    <div className="p-6 flex flex-col md:grid md:grid-cols-3 gap-4 bg-muted">
+    <div className="flex flex-col md:grid md:grid-cols-3 gap-4">
       <QuickActions className={"col-span-3 h-full"}></QuickActions>
 
       <SummaryCard

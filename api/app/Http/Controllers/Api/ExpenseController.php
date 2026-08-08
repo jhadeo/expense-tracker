@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Expense\StoreRequest;
 use App\Http\Requests\Expense\UpdateRequest;
 use App\Http\Resources\ExpenseResource;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -14,9 +15,23 @@ class ExpenseController extends Controller
     public function index(Request $request): JsonResponse
     {
         $exp = $request->user()->expenses;
+        $sum = number_format($request->user()->expenses->sum('amount'), 2, '.', '');
+        $this_week = number_format($request->user()
+            ->expenses()
+            ->whereBetween('date', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])
+            ->sum('amount'), 2, '.', '');
+
+        $this_month = number_format($request->user()
+            ->expenses()
+            ->whereBetween('date', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])
+            ->sum('amount'), 2, '.', '');
 
         return response()->json([
-            'data' => ExpenseResource::collection($exp)
+            'data' => ExpenseResource::collection($exp),
+            'sum' => $sum,
+            'this_week' => $this_week,
+            'this_month' => $this_month
+
         ], 200);
     }
 

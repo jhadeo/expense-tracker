@@ -25,7 +25,7 @@ export default function Navbar() {
     }
   }
   return (
-    <div className="w-full h-full p-4 flex justify-center items-center sticky">
+    <div className="w-full h-full p-4 flex justify-center items-center sticky bg-muted">
       <NavigationMenu>
         <NavigationMenuList>
           <NavigationMenuItem>

@@ -8,6 +8,7 @@ use App\Http\Requests\Income\UpdateRequest;
 use App\Http\Resources\IncomeResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 
 class IncomeController extends Controller
 {
@@ -18,8 +19,22 @@ class IncomeController extends Controller
     {
         $inc = $request->user()->incomes;
 
+        $sum = number_format($request->user()->incomes->sum('amount'), 2, '.', '');
+        $this_week = number_format($request->user()
+            ->incomes()
+            ->whereBetween('date', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])
+            ->sum('amount'), 2, '.', '');
+
+        $this_month = number_format($request->user()
+            ->incomes()
+            ->whereBetween('date', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])
+            ->sum('amount'), 2, '.', '');
+
         return response()->json([
-            'data' => IncomeResource::collection($inc)
+            'data' => IncomeResource::collection($inc),
+            'sum' => $sum,
+            'this_week' => $this_week,
+            'this_month' => $this_month
         ], 200);
     }
 

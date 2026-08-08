@@ -6,7 +6,9 @@ export default function AuthLayout() {
     <>
       <Navbar />
 
-      <Outlet />
+      <main className="bg-muted min-h-screen p-6">
+        <Outlet />
+      </main>
     </>
   );
 }

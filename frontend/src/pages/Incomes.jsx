@@ -3,14 +3,14 @@ import { TableCard } from "@/components/TableCard";
 import { SummaryCard } from "@/components/SummaryCard";
 
 import api from "../api/axios";
-export function Expenses() {
+export function Incomes() {
   const [data, setData] = useState(null);
 
   const [loading, setLoading] = useState(true);
   useEffect(() => {
-    async function fetchExpenses() {
+    async function fetchIncomes() {
       try {
-        const response = await api.get("/expenses");
+        const response = await api.get("/incomes");
         setData(response.data);
       } catch (error) {
         console.error(error);
@@ -18,7 +18,7 @@ export function Expenses() {
         setLoading(false);
       }
     }
-    fetchExpenses();
+    fetchIncomes();
   }, []);
 
   const headers = [
@@ -53,23 +53,23 @@ export function Expenses() {
   return (
     <div className="flex flex-col md:grid md:grid-cols-3 gap-4">
       <SummaryCard
-        title={"Total Expenses"}
+        title={"Total Income"}
         amount={`₱${data.sum}`}
-        color={"text-red-600"}
+        color={"text-green-600"}
       />
       <SummaryCard
-        title={"Expenses this week"}
+        title={"Income this week"}
         amount={`₱${data.this_week}`}
-        color={"text-red-600"}
+        color={"text-green-600"}
       />
       <SummaryCard
-        title={"Expenses this month"}
+        title={"Income this month"}
         amount={`₱${data.this_month}`}
-        color={"text-red-600"}
+        color={"text-green-600"}
       />
       <TableCard
         className={"col-span-3"}
-        title={"Expenses"}
+        title={"Income"}
         rows={data.data}
         headers={headers}
       />

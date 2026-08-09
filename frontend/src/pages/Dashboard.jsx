@@ -1,18 +1,27 @@
 import { useState, useEffect } from "react";
 import { SummaryCard } from "@/components/SummaryCard";
 import { TableCard } from "@/components/TableCard";
-import { QuickActions } from "@/components/QuickActions";
+import { AppCard } from "@/components/Card";
+import { Button } from "@/components/ui/button";
+import { ButtonGroup } from "@/components/ui/button-group";
+import { AppDialog } from "@/components/AppDialog";
+import { DialogClose } from "@/components/ui/dialog";
+import ExpenseForm from "@/components/forms/ExpenseForm";
+import IncomeForm from "@/components/forms/IncomeForm";
 
 import api from "../api/axios";
 
 export function Dashboard() {
   const [data, setData] = useState(null);
+  const [categories, setCategories] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchDashboard() {
       try {
         const response = await api.get("/dashboard");
+        const categoryResponse = await api.get("/categories");
+        setCategories(categoryResponse.data.data);
         setData(response.data.data);
       } catch (error) {
         console.error(error);
@@ -72,7 +81,62 @@ export function Dashboard() {
 
   return (
     <div className="flex flex-col md:grid md:grid-cols-3 gap-4">
-      <QuickActions className={"col-span-3 h-full"}></QuickActions>
+      <AppCard
+        title="Quick Actions"
+        className={"col-span-3 h-full"}
+        content={
+          <div className="flex gap-2">
+            <ButtonGroup className={"w-full"}>
+              <AppDialog
+                trigger={
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className={"w-1/2 text-red-600"}
+                  >
+                    Add Expense
+                  </Button>
+                }
+                title={"Add an expense"}
+                description="Create a new expense."
+                footer={
+                  <>
+                    <DialogClose
+                      render={<Button variant="outline">Cancel</Button>}
+                    />
+                    <Button>Save</Button>
+                  </>
+                }
+              >
+                <ExpenseForm categories={categories}></ExpenseForm>
+              </AppDialog>
+              <AppDialog
+                trigger={
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className={"w-1/2 text-green-600"}
+                  >
+                    Add Income
+                  </Button>
+                }
+                title={"Add income"}
+                description="Create a new income."
+                footer={
+                  <>
+                    <DialogClose
+                      render={<Button variant="outline">Cancel</Button>}
+                    />
+                    <Button>Save</Button>
+                  </>
+                }
+              >
+                <IncomeForm categories={categories}></IncomeForm>
+              </AppDialog>
+            </ButtonGroup>
+          </div>
+        }
+      />
 
       <SummaryCard
         title="Your Balance"

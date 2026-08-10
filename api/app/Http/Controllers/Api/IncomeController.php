@@ -17,7 +17,7 @@ class IncomeController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $inc = $request->user()->incomes;
+        $inc = $request->user()->incomes()->latest()->paginate(15);
 
         $sum = number_format($request->user()->incomes->sum('amount'), 2, '.', '');
         $this_week = number_format($request->user()

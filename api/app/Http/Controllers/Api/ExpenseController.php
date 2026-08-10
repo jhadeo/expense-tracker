@@ -14,7 +14,7 @@ class ExpenseController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
-        $exp = $request->user()->expenses;
+        $exp = $request->user()->expenses()->latest()->paginate(15);
         $sum = number_format($request->user()->expenses->sum('amount'), 2, '.', '');
         $this_week = number_format($request->user()
             ->expenses()

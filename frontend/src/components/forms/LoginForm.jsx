@@ -89,7 +89,7 @@ export function LoginForm() {
                 id="email"
                 placeholder="john@example.com"
                 {...register("email")}
-                aria-invalid={!!errors.password}
+                aria-invalid={!!errors.email}
               />
               {errors.email && (
                 <p className="text-sm text-red-600">{errors.email.message}</p>

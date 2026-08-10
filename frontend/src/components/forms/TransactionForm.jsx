@@ -19,7 +19,7 @@ import { transactionSchema } from "@/schemas/transactionSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import api from "@/api/axios";
 
-export default function IncomeForm({ categories, onSuccess, onClose }) {
+export function TransactionForm({ type, categories, onSuccess, onClose }) {
   const {
     register,
     handleSubmit,
@@ -38,11 +38,11 @@ export default function IncomeForm({ categories, onSuccess, onClose }) {
   });
 
   const systemCategories = categories
-    ?.filter((category) => category.is_system && category.type == "income")
+    ?.filter((category) => category.is_system && category.type == type)
     .map((category) => ({ label: category.name, value: category.id }));
 
   const userCategories = categories
-    ?.filter((category) => !category.is_system && category.type == "income")
+    ?.filter((category) => !category.is_system && category.type == type)
     .map((category) => ({ label: category.name, value: category.id }));
 
   const allCategories = [
@@ -52,8 +52,13 @@ export default function IncomeForm({ categories, onSuccess, onClose }) {
   ];
 
   async function onSubmit(data) {
+    let endpoint = "/expenses";
+    if (type === "income") {
+      endpoint = "/incomes";
+    }
+
     try {
-      await api.post("/incomes", data);
+      await api.post(endpoint, data);
       reset();
       onSuccess();
       onClose();
@@ -108,7 +113,7 @@ export default function IncomeForm({ categories, onSuccess, onClose }) {
           )}
         </Field>
         <Field>
-          <FieldLabel htmlFor="date">Income Date</FieldLabel>
+          <FieldLabel htmlFor="date">Date</FieldLabel>
           <Input
             type="date"
             id="date"
@@ -165,8 +170,19 @@ export default function IncomeForm({ categories, onSuccess, onClose }) {
               </Select>
             )}
           />
+          {errors.category_id && (
+            <p className="text-sm text-red-600 text-center">
+              {errors.category_id.message}
+            </p>
+          )}
         </Field>
       </FieldGroup>
+
+      {errors.root && (
+        <p className="text-sm text-red-600 text-center">
+          {errors.root.message}
+        </p>
+      )}
 
       <DialogFooter className={"mt-4"}>
         <DialogClose render={<Button variant="outline">Cancel</Button>} />

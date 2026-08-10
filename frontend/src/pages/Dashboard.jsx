@@ -6,8 +6,8 @@ import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
 import { AppDialog } from "@/components/AppDialog";
 import { DialogClose } from "@/components/ui/dialog";
-import ExpenseForm from "@/components/forms/ExpenseForm";
-import IncomeForm from "@/components/forms/IncomeForm";
+
+import { TransactionForm } from "@/components/forms/TransactionForm";
 
 import api from "../api/axios";
 
@@ -15,8 +15,8 @@ export function Dashboard() {
   const [data, setData] = useState(null);
   const [categories, setCategories] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [incomeDialogOpen, setIncomeDialogOpen] = useState(false);
-  const [expenseDialogOpen, setExpenseDialogOpen] = useState(false);
+  const [incomeOpen, setIncomeOpen] = useState(false);
+  const [expenseOpen, setExpenseOpen] = useState(false);
 
   async function fetchDashboard() {
     try {
@@ -92,8 +92,8 @@ export function Dashboard() {
           <div className="flex gap-2">
             <ButtonGroup className={"w-full"}>
               <AppDialog
-                open={expenseDialogOpen}
-                onOpenChange={setExpenseDialogOpen}
+                open={expenseOpen}
+                onOpenChange={setExpenseOpen}
                 trigger={
                   <Button
                     variant="outline"
@@ -114,15 +114,16 @@ export function Dashboard() {
                   </>
                 }
               >
-                <ExpenseForm
+                <TransactionForm
+                  type={"expenses"}
                   categories={categories}
                   onSuccess={fetchDashboard}
-                  onClose={() => setExpenseDialogOpen(false)}
+                  onClose={() => setExpenseOpen(false)}
                 />
               </AppDialog>
               <AppDialog
-                open={incomeDialogOpen}
-                onOpenChange={setIncomeDialogOpen}
+                open={incomeOpen}
+                onOpenChange={setIncomeOpen}
                 trigger={
                   <Button
                     variant="outline"
@@ -135,10 +136,11 @@ export function Dashboard() {
                 title={"Add income"}
                 description="Create a new income."
               >
-                <IncomeForm
+                <TransactionForm
+                  type={"income"}
                   categories={categories}
                   onSuccess={fetchDashboard}
-                  onClose={() => setIncomeDialogOpen(false)}
+                  onClose={() => setIncomeOpen(false)}
                 />
               </AppDialog>
             </ButtonGroup>

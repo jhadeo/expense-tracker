@@ -5,35 +5,27 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  DialogFooter,
 } from "@/components/ui/dialog";
 
 export function AppDialog({
+  open,
+  onOpenChange,
   trigger,
   title,
   description,
   children,
-  footer,
 }) {
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger render={trigger} />
 
       <DialogContent showCloseButton={true}>
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
-          {description && (
-            <DialogDescription>
-              {description}
-            </DialogDescription>
-          )}
+          {description && <DialogDescription>{description}</DialogDescription>}
         </DialogHeader>
 
         {children}
-
-        <DialogFooter>
-          {footer}
-        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

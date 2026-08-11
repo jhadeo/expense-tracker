@@ -15,27 +15,45 @@ class IncomeController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request): JsonResponse
+    public function index(Request $request)
     {
-        $inc = $request->user()->incomes()->latest()->paginate(15);
+        $user = $request->user();
 
-        $sum = number_format($request->user()->incomes->sum('amount'), 2, '.', '');
-        $this_week = number_format($request->user()
-            ->incomes()
-            ->whereBetween('date', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])
-            ->sum('amount'), 2, '.', '');
+        $incomes = $user->incomes()
+            ->with('category')
+            ->latest()
+            ->paginate(15);
 
-        $this_month = number_format($request->user()
-            ->incomes()
-            ->whereBetween('date', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])
-            ->sum('amount'), 2, '.', '');
+        $summary = [
+            'sum' => number_format($user->incomes()->sum('amount'), 2, '.', ''),
+            'this_week' => number_format(
+                $user->incomes()
+                    ->whereBetween('date', [
+                        Carbon::now()->startOfWeek(),
+                        Carbon::now()->endOfWeek(),
+                    ])
+                    ->sum('amount'),
+                2,
+                '.',
+                ''
+            ),
+            'this_month' => number_format(
+                $user->incomes()
+                    ->whereBetween('date', [
+                        Carbon::now()->startOfMonth(),
+                        Carbon::now()->endOfMonth(),
+                    ])
+                    ->sum('amount'),
+                2,
+                '.',
+                ''
+            ),
+        ];
 
-        return response()->json([
-            'data' => IncomeResource::collection($inc),
-            'sum' => $sum,
-            'this_week' => $this_week,
-            'this_month' => $this_month
-        ], 200);
+        return IncomeResource::collection($incomes)
+            ->additional([
+                'summary' => $summary,
+            ]);
     }
 
     /**

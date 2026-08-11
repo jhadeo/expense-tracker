@@ -19,7 +19,7 @@ import { transactionSchema } from "@/schemas/transactionSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import api from "@/api/axios";
 
-export function TransactionForm({ type, categories, onSuccess, onClose }) {
+export function TransactionForm({ type, categories, onSuccess, onClose, initialData }) {
   const {
     register,
     handleSubmit,
@@ -29,7 +29,7 @@ export function TransactionForm({ type, categories, onSuccess, onClose }) {
     formState: { errors, isSubmitting },
   } = useForm({
     resolver: zodResolver(transactionSchema),
-    defaultValues: {
+    defaultValues: initialData ?? {
       title: "",
       amount: undefined,
       date: new Date().toISOString().split("T")[0],

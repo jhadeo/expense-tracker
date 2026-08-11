@@ -12,27 +12,45 @@ use Illuminate\Http\Request;
 
 class ExpenseController extends Controller
 {
-    public function index(Request $request): JsonResponse
+    public function index(Request $request)
     {
-        $exp = $request->user()->expenses()->latest()->paginate(15);
-        $sum = number_format($request->user()->expenses->sum('amount'), 2, '.', '');
-        $this_week = number_format($request->user()
-            ->expenses()
-            ->whereBetween('date', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])
-            ->sum('amount'), 2, '.', '');
+        $user = $request->user();
 
-        $this_month = number_format($request->user()
-            ->expenses()
-            ->whereBetween('date', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])
-            ->sum('amount'), 2, '.', '');
+        $expenses = $user->expenses()
+            ->with('category')
+            ->latest()
+            ->paginate(15);
 
-        return response()->json([
-            'data' => ExpenseResource::collection($exp),
-            'sum' => $sum,
-            'this_week' => $this_week,
-            'this_month' => $this_month
+        $summary = [
+            'sum' => number_format($user->expenses()->sum('amount'), 2, '.', ''),
+            'this_week' => number_format(
+                $user->expenses()
+                    ->whereBetween('date', [
+                        Carbon::now()->startOfWeek(),
+                        Carbon::now()->endOfWeek(),
+                    ])
+                    ->sum('amount'),
+                2,
+                '.',
+                ''
+            ),
+            'this_month' => number_format(
+                $user->expenses()
+                    ->whereBetween('date', [
+                        Carbon::now()->startOfMonth(),
+                        Carbon::now()->endOfMonth(),
+                    ])
+                    ->sum('amount'),
+                2,
+                '.',
+                ''
+            ),
+        ];
 
-        ], 200);
+        return ExpenseResource::collection($expenses)
+            ->additional([
+                'summary' => $summary,
+            ]);
     }
 
     /**

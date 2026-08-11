@@ -1,78 +1,64 @@
 import { useState, useEffect } from "react";
-import { TableCard } from "@/components/TableCard";
+import { DataTable } from "@/components/DataTable";
+import { getTransactionColumns } from "@/components/columns/transactions";
 import { SummaryCard } from "@/components/SummaryCard";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { AppDialog } from "@/components/AppDialog";
 
 import api from "../api/axios";
 export function Incomes() {
   const [data, setData] = useState(null);
-
   const [loading, setLoading] = useState(true);
-  useEffect(() => {
-    async function fetchIncomes() {
-      try {
-        const response = await api.get("/incomes");
-        setData(response.data);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(false);
-      }
+
+  async function fetchIncomes() {
+    try {
+      const response = await api.get("/incomes");
+      setData(response.data);
+    } finally {
+      setLoading(false);
     }
+  }
+
+  useEffect(() => {
     fetchIncomes();
   }, []);
-
-  const headers = [
-    {
-      key: "title",
-      label: "Title",
-    },
-    {
-      key: "category",
-      label: "Category",
-    },
-    {
-      key: "date",
-      label: "Date",
-      render: (row) =>
-        new Date(row.date).toLocaleDateString("en-US", {
-          month: "2-digit",
-          day: "2-digit",
-          year: "2-digit",
-        }),
-    },
-    {
-      key: "amount",
-      label: "Amount",
-      render: (row) => `₱${row.amount}`,
-    },
-  ];
 
   if (loading) {
     return <p>Loading...</p>;
   }
+
   return (
     <div className="flex flex-col md:grid md:grid-cols-3 gap-4">
       <SummaryCard
         title={"Total Income"}
-        amount={`₱${data.sum}`}
+        amount={`₱${data.summary.sum}`}
         color={"text-green-600"}
       />
       <SummaryCard
         title={"Income this week"}
-        amount={`₱${data.this_week}`}
+        amount={`₱${data.summary.this_week}`}
         color={"text-green-600"}
       />
       <SummaryCard
         title={"Income this month"}
-        amount={`₱${data.this_month}`}
+        amount={`₱${data.summary.this_month}`}
         color={"text-green-600"}
       />
-      <TableCard
-        className={"col-span-3"}
-        title={"Income"}
-        rows={data.data}
-        headers={headers}
-      />
+
+      <Card className={"col-span-3"}>
+        <CardHeader>
+          <CardTitle>Your Income</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <DataTable
+            data={data.data}
+            columns={getTransactionColumns({
+              type: "income",
+              onRefresh: fetchIncomes,
+            })}
+          />
+        </CardContent>
+      </Card>
     </div>
   );
 }

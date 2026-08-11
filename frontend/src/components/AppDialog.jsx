@@ -17,7 +17,7 @@ export function AppDialog({
 }) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogTrigger render={trigger} />
+      {trigger && <DialogTrigger render={trigger} />}
 
       <DialogContent showCloseButton={true}>
         <DialogHeader>

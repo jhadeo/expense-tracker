@@ -1,4 +1,3 @@
-import { Controller, useForm } from "react-hook-form";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import {
@@ -15,11 +14,19 @@ import { DialogClose, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "../ui/spinner";
 
+import { Controller, useForm } from "react-hook-form";
+import { useEffect } from "react";
 import { transactionSchema } from "@/schemas/transactionSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import api from "@/api/axios";
 
-export function TransactionForm({ type, categories, onSuccess, onClose, initialData }) {
+export function TransactionForm({
+  type,
+  categories,
+  onSuccess,
+  onClose,
+  initialData,
+}) {
   const {
     register,
     handleSubmit,
@@ -33,23 +40,39 @@ export function TransactionForm({ type, categories, onSuccess, onClose, initialD
       title: "",
       amount: undefined,
       date: new Date().toISOString().split("T")[0],
-      category_id: null,
+      category_id: "",
     },
   });
 
-  const systemCategories = categories
-    ?.filter((category) => category.is_system && category.type == type)
-    .map((category) => ({ label: category.name, value: category.id }));
+  useEffect(() => {
+    if (initialData) {
+      reset(initialData);
+    }
+  }, [initialData, reset]);
 
-  const userCategories = categories
-    ?.filter((category) => !category.is_system && category.type == type)
-    .map((category) => ({ label: category.name, value: category.id }));
+  const systemCategories =
+    categories
+      ?.filter((category) => category.is_system && category.type === type)
+      .map((category) => ({
+        label: category.name,
+        value: category.id.toString(),
+      })) ?? [];
+
+  const userCategories =
+    categories
+      ?.filter((category) => !category.is_system && category.type === type)
+      .map((category) => ({
+        label: category.name,
+        value: category.id.toString(),
+      })) ?? [];
 
   const allCategories = [
     { label: "Select a category", value: null },
     ...systemCategories,
     ...userCategories,
   ];
+
+  const isEditing = !!initialData?.id;
 
   async function onSubmit(data) {
     let endpoint = "/expenses";
@@ -58,10 +81,16 @@ export function TransactionForm({ type, categories, onSuccess, onClose, initialD
     }
 
     try {
-      await api.post(endpoint, data);
-      reset();
-      onSuccess();
-      onClose();
+      const request = isEditing
+        ? api.patch(`${endpoint}/${initialData.id}`, data)
+        : api.post(endpoint, data);
+
+      await request;
+      onSuccess?.();
+      onClose?.();
+      if (!isEditing) {
+        reset();
+      }
     } catch (error) {
       if (error.response?.status === 401) {
         setError("root", {
@@ -189,10 +218,13 @@ export function TransactionForm({ type, categories, onSuccess, onClose, initialD
         <Button type="submit" disabled={isSubmitting}>
           {isSubmitting ? (
             <>
-              <Spinner /> Submitting...
+              <Spinner />
+              {isEditing ? "Saving..." : "Submitting..."}
             </>
+          ) : isEditing ? (
+            "Save Changes"
           ) : (
-            "Submit"
+            "Create"
           )}
         </Button>
       </DialogFooter>

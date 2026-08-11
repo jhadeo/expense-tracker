@@ -28,6 +28,7 @@ export function getTransactionColumns({ type, onRefresh, categories }) {
           year: "numeric",
           month: "short",
           day: "numeric",
+          timeZone:"UTC"
         });
       },
     }),
@@ -39,6 +40,7 @@ export function getTransactionColumns({ type, onRefresh, categories }) {
           transaction={row.original}
           type={type}
           onRefresh={onRefresh}
+          categories={categories}
         />
       ),
     }),

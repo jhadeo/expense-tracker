@@ -16,13 +16,17 @@ import { TransactionForm } from "./forms/TransactionForm";
 
 import api from "@/api/axios";
 
-export function TransactionActions({ transaction, type, onRefresh, categories }) {
+export function TransactionActions({
+  transaction,
+  type,
+  onRefresh,
+  categories,
+}) {
   const [openDelete, setOpenDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState(null);
 
   const [openEdit, setOpenEdit] = useState(false);
-  const [editing, setEditing] = useState(false);
 
   async function handleDelete() {
     setDeleting(true);
@@ -119,13 +123,26 @@ export function TransactionActions({ transaction, type, onRefresh, categories })
       <AppDialog
         open={openEdit}
         onOpenChange={(next) => {
-          if (!editing) {
-            setOpenEdit(next);
-            if (!next) setError(null);
+          setOpenEdit(next);
+
+          if (!next) {
+            setError(null);
           }
         }}
       >
-        <TransactionForm categories={categories}/>
+        <TransactionForm
+          type={type}
+          categories={categories}
+          onSuccess={onRefresh}
+          onClose={() => setOpenEdit(false)}
+          initialData={{
+            id: transaction.id,
+            title: transaction.title,
+            amount: transaction.amount,
+            date: new Date(transaction.date).toISOString().split("T")[0],
+            category_id: transaction.category_id.toString(),
+          }}
+        />
       </AppDialog>
     </>
   );

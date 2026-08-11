@@ -6,34 +6,34 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 import { SummaryCardSkeleton } from "@/components/skeleton/summarycard-skeleton";
 import { TableSkeleton } from "@/components/skeleton/table-skeleton";
+import { Button } from "@/components/ui/button";
+import { AppDialog } from "@/components/AppDialog";
+import { TransactionForm } from "@/components/forms/TransactionForm";
 
 import api from "../api/axios";
 export function Incomes() {
   const [data, setData] = useState(null);
   const [categories, setCategories] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [incomeOpen, setIncomeOpen] = useState(false);
 
-  async function fetchIncomes() {
+  async function fetchIncomesPageData() {
     try {
+      const categoryResponse = await api.get("/categories");
+      setCategories(categoryResponse.data);
+
       const response = await api.get("/incomes");
       setData(response.data);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function fetchCategories() {
-    try {
-      const response = await api.get("/categories");
-      setCategories(response.data);
+    } catch {
+      setError("Unable to load income data. Please try again.");
     } finally {
       setLoading(false);
     }
   }
 
   useEffect(() => {
-    fetchIncomes();
-    fetchCategories();
+    fetchIncomesPageData();
   }, []);
 
   if (loading) {
@@ -47,6 +47,14 @@ export function Incomes() {
         </div>
       </div>
     );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col md:grid md:grid-cols-3 gap-4">
+        <p className="col-span-3">{error}</p>
+      </div>
+    )
   }
 
   return (
@@ -69,14 +77,32 @@ export function Incomes() {
 
       <Card className={"col-span-3"}>
         <CardHeader>
-          <CardTitle>Your Income</CardTitle>
+          <div className="flex justify-between">
+            <CardTitle>Your Income</CardTitle>
+            <AppDialog
+              open={incomeOpen}
+              onOpenChange={setIncomeOpen}
+              trigger={<Button>Add Income</Button>}
+              title={"Add income"}
+              description="Create a new income."
+            >
+              <TransactionForm
+                type={"income"}
+                request={"create"}
+                categories={categories.data}
+                onSuccess={fetchIncomesPageData}
+                onClose={() => setIncomeOpen(false)}
+              />
+            </AppDialog>
+          </div>
         </CardHeader>
         <CardContent>
           <DataTable
             data={data.data}
             columns={getTransactionColumns({
               type: "income",
-              onRefresh: fetchIncomes,
+              onRefresh: fetchIncomesPageData,
+              categories: categories.data,
             })}
           />
         </CardContent>

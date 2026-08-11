@@ -10,6 +10,7 @@ import { TableSkeleton } from "@/components/skeleton/table-skeleton";
 import api from "../api/axios";
 export function Incomes() {
   const [data, setData] = useState(null);
+  const [categories, setCategories] = useState(null);
   const [loading, setLoading] = useState(true);
 
   async function fetchIncomes() {
@@ -21,18 +22,28 @@ export function Incomes() {
     }
   }
 
+  async function fetchCategories() {
+    try {
+      const response = await api.get("/categories");
+      setCategories(response.data);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   useEffect(() => {
     fetchIncomes();
+    fetchCategories();
   }, []);
 
   if (loading) {
     return (
       <div className="flex flex-col md:grid md:grid-cols-3 gap-4">
-        <SummaryCardSkeleton/>
-        <SummaryCardSkeleton/>
-        <SummaryCardSkeleton/>
+        <SummaryCardSkeleton />
+        <SummaryCardSkeleton />
+        <SummaryCardSkeleton />
         <div className="col-span-3">
-          <TableSkeleton/>
+          <TableSkeleton />
         </div>
       </div>
     );

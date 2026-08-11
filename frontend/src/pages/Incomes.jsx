@@ -3,7 +3,9 @@ import { DataTable } from "@/components/DataTable";
 import { getTransactionColumns } from "@/components/columns/transactions";
 import { SummaryCard } from "@/components/SummaryCard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { AppDialog } from "@/components/AppDialog";
+
+import { SummaryCardSkeleton } from "@/components/skeleton/summarycard-skeleton";
+import { TableSkeleton } from "@/components/skeleton/table-skeleton";
 
 import api from "../api/axios";
 export function Incomes() {
@@ -24,7 +26,16 @@ export function Incomes() {
   }, []);
 
   if (loading) {
-    return <p>Loading...</p>;
+    return (
+      <div className="flex flex-col md:grid md:grid-cols-3 gap-4">
+        <SummaryCardSkeleton/>
+        <SummaryCardSkeleton/>
+        <SummaryCardSkeleton/>
+        <div className="col-span-3">
+          <TableSkeleton/>
+        </div>
+      </div>
+    );
   }
 
   return (

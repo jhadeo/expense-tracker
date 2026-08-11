@@ -9,6 +9,9 @@ import { DialogClose } from "@/components/ui/dialog";
 
 import { TransactionForm } from "@/components/forms/TransactionForm";
 
+import { SummaryCardSkeleton } from "@/components/skeleton/summarycard-skeleton";
+import { TableSkeleton } from "@/components/skeleton/table-skeleton";
+
 import api from "../api/axios";
 
 export function Dashboard() {
@@ -35,10 +38,6 @@ export function Dashboard() {
   useEffect(() => {
     fetchDashboard();
   }, []);
-
-  if (loading) {
-    return <p>Loading...</p>;
-  }
 
   const recentHeaders = [
     {
@@ -82,6 +81,31 @@ export function Dashboard() {
       ),
     },
   ];
+
+  if (loading) {
+    return (
+      <div className="flex flex-col md:grid md:grid-cols-3 gap-4">
+        <div className="col-span-3">
+          <SummaryCardSkeleton />
+        </div>
+
+        <SummaryCardSkeleton />
+        <SummaryCardSkeleton />
+        <SummaryCardSkeleton />
+
+        <div className="row-span-2">
+          <TableSkeleton />
+        </div>
+
+        <div className="col-span-2">
+          <TableSkeleton />
+        </div>
+        <div className="col-span-2">
+          <TableSkeleton />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col md:grid md:grid-cols-3 gap-4">

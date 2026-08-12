@@ -1,78 +1,111 @@
 import { useState, useEffect } from "react";
-import { TableCard } from "@/components/TableCard";
+import { DataTable } from "@/components/DataTable";
+import { getTransactionColumns } from "@/components/columns/transactions";
 import { SummaryCard } from "@/components/SummaryCard";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
+import { SummaryCardSkeleton } from "@/components/skeleton/summarycard-skeleton";
+import { TableSkeleton } from "@/components/skeleton/table-skeleton";
+import { Button } from "@/components/ui/button";
+import { AppDialog } from "@/components/AppDialog";
+import { TransactionForm } from "@/components/forms/TransactionForm";
 
 import api from "../api/axios";
 export function Expenses() {
   const [data, setData] = useState(null);
-
+  const [categories, setCategories] = useState(null);
   const [loading, setLoading] = useState(true);
-  useEffect(() => {
-    async function fetchExpenses() {
-      try {
-        const response = await api.get("/expenses");
-        setData(response.data);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(false);
-      }
+  const [error, setError] = useState(null);
+  const [expenseOpen, setExpenseOpen] = useState(false);
+
+  async function fetchExpensesPageData() {
+    try {
+      const categoryResponse = await api.get("/categories");
+      setCategories(categoryResponse.data);
+
+      const response = await api.get("/expenses");
+      setData(response.data);
+    } catch {
+      setError("Unable to load expense data. Please try again.");
+    } finally {
+      setLoading(false);
     }
-    fetchExpenses();
+  }
+
+  useEffect(() => {
+    fetchExpensesPageData();
   }, []);
 
-  const headers = [
-    {
-      key: "title",
-      label: "Title",
-    },
-    {
-      key: "category",
-      label: "Category",
-    },
-    {
-      key: "date",
-      label: "Date",
-      render: (row) =>
-        new Date(row.date).toLocaleDateString("en-US", {
-          month: "2-digit",
-          day: "2-digit",
-          year: "2-digit",
-        }),
-    },
-    {
-      key: "amount",
-      label: "Amount",
-      render: (row) => `₱${row.amount}`,
-    },
-  ];
-
   if (loading) {
-    return <p>Loading...</p>;
+    return (
+      <div className="flex flex-col md:grid md:grid-cols-3 gap-4">
+        <SummaryCardSkeleton />
+        <SummaryCardSkeleton />
+        <SummaryCardSkeleton />
+        <div className="col-span-3">
+          <TableSkeleton />
+        </div>
+      </div>
+    );
   }
+
+  if (error) {
+    return (
+      <div className="flex flex-col md:grid md:grid-cols-3 gap-4">
+        <p className="col-span-3">{error}</p>
+      </div>
+    )
+  }
+
   return (
     <div className="flex flex-col md:grid md:grid-cols-3 gap-4">
       <SummaryCard
         title={"Total Expenses"}
-        amount={`₱${data.sum}`}
+        amount={`₱${data.summary.sum}`}
         color={"text-red-600"}
       />
       <SummaryCard
-        title={"Expenses this week"}
-        amount={`₱${data.this_week}`}
+        title={"Expense this week"}
+        amount={`₱${data.summary.this_week}`}
         color={"text-red-600"}
       />
       <SummaryCard
-        title={"Expenses this month"}
-        amount={`₱${data.this_month}`}
+        title={"Expense this month"}
+        amount={`₱${data.summary.this_month}`}
         color={"text-red-600"}
       />
-      <TableCard
-        className={"col-span-3"}
-        title={"Expenses"}
-        rows={data.data}
-        headers={headers}
-      />
+
+      <Card className={"col-span-3"}>
+        <CardHeader>
+          <div className="flex justify-between">
+            <CardTitle>Your Expenses</CardTitle>
+            <AppDialog
+              open={expenseOpen}
+              onOpenChange={setExpenseOpen}
+              trigger={<Button>Add Expense</Button>}
+              title={"Add expense"}
+              description="Create a new expense."
+            >
+              <TransactionForm
+                type={"expenses"}
+                categories={categories.data}
+                onSuccess={fetchExpensesPageData}
+                onClose={() => setExpenseOpen(false)}
+              />
+            </AppDialog>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <DataTable
+            data={data.data}
+            columns={getTransactionColumns({
+              type: "expenses",
+              onRefresh: fetchExpensesPageData,
+              categories: categories.data,
+            })}
+          />
+        </CardContent>
+      </Card>
     </div>
   );
 }

@@ -35,21 +35,21 @@ export default function Navbar() {
           </NavigationMenuItem>
 
           <NavigationMenuItem>
-            <NavigationMenuTrigger>Income</NavigationMenuTrigger>
-            <NavigationMenuContent>
-              <NavigationMenuLink render={<Link to={"/incomes"} />}>
-                View Incomes
-              </NavigationMenuLink>
-            </NavigationMenuContent>
+            <NavigationMenuLink render={<Link to={"/incomes"} />}>
+              Incomes
+            </NavigationMenuLink>
           </NavigationMenuItem>
 
           <NavigationMenuItem>
-            <NavigationMenuTrigger>Expenses</NavigationMenuTrigger>
-            <NavigationMenuContent>
-              <NavigationMenuLink render={<Link to={"/expenses"} />}>
-                View Expenses
-              </NavigationMenuLink>
-            </NavigationMenuContent>
+            <NavigationMenuLink render={<Link to={"/expenses"} />}>
+              Expenses
+            </NavigationMenuLink>
+          </NavigationMenuItem>
+
+          <NavigationMenuItem>
+            <NavigationMenuLink render={<Link to={"/categories"} />}>
+              Categories
+            </NavigationMenuLink>
           </NavigationMenuItem>
 
           <NavigationMenuItem>

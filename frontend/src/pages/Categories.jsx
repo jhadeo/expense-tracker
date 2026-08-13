@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TableSkeleton } from "@/components/skeleton/table-skeleton";
 import { Button } from "@/components/ui/button";
 import { AppDialog } from "@/components/AppDialog";
+import { ErrorCard } from "@/components/ErrorCard";
 
 import api from "../api/axios";
 import { CategoryForm } from "@/components/forms/CategoryForm";
@@ -31,6 +32,16 @@ export function Categories() {
   useEffect(() => {
     fetchCategories();
   }, []);
+
+  if (error) {
+    return (
+      <ErrorCard
+        title="Unable to load categories."
+        message="Please try again later."
+      />
+    );
+  }
+
   if (loading) {
     return <TableSkeleton />;
   }

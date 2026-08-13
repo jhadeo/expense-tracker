@@ -13,16 +13,13 @@ import { TransactionForm } from "@/components/forms/TransactionForm";
 import api from "../api/axios";
 export function Expenses() {
   const [data, setData] = useState(null);
-  const [categories, setCategories] = useState(null);
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [expenseOpen, setExpenseOpen] = useState(false);
 
   async function fetchExpensesPageData() {
     try {
-      const categoryResponse = await api.get("/categories");
-      setCategories(categoryResponse.data);
-
       const response = await api.get("/expenses");
       setData(response.data);
     } catch {
@@ -32,9 +29,26 @@ export function Expenses() {
     }
   }
 
+  async function fetchCategories() {
+    try {
+      const categoryResponse = await api.get("/categories");
+      setCategories(categoryResponse.data);
+    } catch (error) {
+      console.error("Unable to load categories", error);
+    }
+  }
+
   useEffect(() => {
     fetchExpensesPageData();
   }, []);
+
+  function handleExpenseOpenChange(next) {
+    setExpenseOpen(next);
+
+    if (next) {
+      fetchCategories();
+    }
+  }
 
   if (loading) {
     return (
@@ -54,7 +68,7 @@ export function Expenses() {
       <div className="flex flex-col md:grid md:grid-cols-3 gap-4">
         <p className="col-span-3">{error}</p>
       </div>
-    )
+    );
   }
 
   return (
@@ -81,7 +95,7 @@ export function Expenses() {
             <CardTitle>Your Expenses</CardTitle>
             <AppDialog
               open={expenseOpen}
-              onOpenChange={setExpenseOpen}
+              onOpenChange={handleExpenseOpenChange}
               trigger={<Button>Add Expense</Button>}
               title={"Add expense"}
               description="Create a new expense."

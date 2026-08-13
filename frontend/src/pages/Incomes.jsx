@@ -13,16 +13,13 @@ import { TransactionForm } from "@/components/forms/TransactionForm";
 import api from "../api/axios";
 export function Incomes() {
   const [data, setData] = useState(null);
-  const [categories, setCategories] = useState(null);
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [incomeOpen, setIncomeOpen] = useState(false);
 
   async function fetchIncomesPageData() {
     try {
-      const categoryResponse = await api.get("/categories");
-      setCategories(categoryResponse.data);
-
       const response = await api.get("/incomes");
       setData(response.data);
     } catch {
@@ -32,10 +29,26 @@ export function Incomes() {
     }
   }
 
+  async function fetchCategories() {
+    try {
+      const categoryResponse = await api.get("/categories");
+      setCategories(categoryResponse.data);
+    } catch (error) {
+      console.error("Unable to load categories", error);
+    }
+  }
+
   useEffect(() => {
     fetchIncomesPageData();
   }, []);
 
+  function handleIncomeOpenChange(next) {
+    setIncomeOpen(next);
+
+    if (next) {
+      fetchCategories();
+    }
+  }
   if (loading) {
     return (
       <div className="flex flex-col md:grid md:grid-cols-3 gap-4">
@@ -54,7 +67,7 @@ export function Incomes() {
       <div className="flex flex-col md:grid md:grid-cols-3 gap-4">
         <p className="col-span-3">{error}</p>
       </div>
-    )
+    );
   }
 
   return (
@@ -81,7 +94,7 @@ export function Incomes() {
             <CardTitle>Your Income</CardTitle>
             <AppDialog
               open={incomeOpen}
-              onOpenChange={setIncomeOpen}
+              onOpenChange={handleIncomeOpenChange}
               trigger={<Button>Add Income</Button>}
               title={"Add income"}
               description="Create a new income."

@@ -15,10 +15,10 @@ import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 
-import { loginSchema } from "@/schemas/loginSchema";
+import { registerSchema } from "@/schemas/registerSchema";
 import api from "@/api/axios";
 
-export function LoginForm() {
+export function RegisterForm() {
   const {
     register,
     handleSubmit,
@@ -26,28 +26,19 @@ export function LoginForm() {
     setError,
     formState: { errors, isSubmitting },
   } = useForm({
-    resolver: zodResolver(loginSchema),
-    defaultValues: {
-      email: "",
-      password: "",
-    },
+    resolver: zodResolver(registerSchema),
   });
   const navigate = useNavigate();
 
   async function onSubmit(data) {
     try {
-      const response = await api.post("/login", data);
+      const response = await api.post("/register", data);
 
       localStorage.setItem("token", response.data.token);
 
       navigate("/dashboard");
     } catch (error) {
-      if (error.response?.status === 401) {
-        setError("root", {
-          type: "server",
-          message: "Invalid email or password.",
-        });
-      } else if (error.response?.status === 422) {
+      if (error.response?.status === 422) {
         const serverErrors = error.response.data.errors;
 
         Object.entries(serverErrors).forEach(([field, messages]) => {
@@ -66,26 +57,53 @@ export function LoginForm() {
   }
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      className="mx-auto w-full max-w-sm"
-    >
+    <form onSubmit={handleSubmit(onSubmit)} className="mx-auto w-full max-w-sm">
       <Card>
         <CardHeader>
-          <CardTitle className="text-center">Login</CardTitle>
+          <CardTitle className="text-center">Register</CardTitle>
           <CardDescription className="text-center">
-            Enter your email and password to continue.
+            Fill out your details to create your account.
           </CardDescription>
         </CardHeader>
 
         <CardContent>
-          <FieldGroup>
+          <FieldGroup  className={"grid grid-cols-2 w-full"}>
             {errors.root && (
-              <p className="text-sm text-red-600 text-center">
+              <p className="text-sm text-red-600 text-center col-span-2">
                 {errors.root.message}
               </p>
             )}
             <Field>
+              <FieldLabel htmlFor="first_name">First Name</FieldLabel>
+              <Input
+                type="text"
+                id="first_name"
+                placeholder="John"
+                {...register("first_name")}
+                aria-invalid={!!errors.first_name}
+              />
+              {errors.first_name && (
+                <p className="text-sm text-red-600">
+                  {errors.first_name.message}
+                </p>
+              )}
+            </Field>
+            <Field>
+              <FieldLabel htmlFor="last_name">Last Name</FieldLabel>
+              <Input
+                type="text"
+                id="last_name"
+                placeholder="Smith"
+                {...register("last_name")}
+                aria-invalid={!!errors.last_name}
+              />
+              {errors.last_name && (
+                <p className="text-sm text-red-600">
+                  {errors.last_name.message}
+                </p>
+              )}
+            </Field>
+            <Field className={"col-span-2"}>
               <FieldLabel htmlFor="email">Email</FieldLabel>
               <Input
                 type="email"
@@ -98,7 +116,7 @@ export function LoginForm() {
                 <p className="text-sm text-red-600">{errors.email.message}</p>
               )}
             </Field>
-            <Field>
+            <Field className={"col-span-2"}>
               <FieldLabel htmlFor="password">Password</FieldLabel>
               <Input
                 type="password"
@@ -113,6 +131,23 @@ export function LoginForm() {
                 </p>
               )}
             </Field>
+            <Field className={"col-span-2"}>
+              <FieldLabel htmlFor="password_confirmation">
+                Confirm Password
+              </FieldLabel>
+              <Input
+                type="password"
+                id="password_confirmation"
+                placeholder="Confirm your password"
+                {...register("password_confirmation")}
+                aria-invalid={!!errors.password_confirmation}
+              />
+              {errors.password_confirmation && (
+                <p className="text-sm text-red-600">
+                  {errors.password_confirmation.message}
+                </p>
+              )}
+            </Field>
           </FieldGroup>
         </CardContent>
 
@@ -124,10 +159,10 @@ export function LoginForm() {
             <Button type="submit" disabled={isSubmitting}>
               {isSubmitting ? (
                 <>
-                  <Spinner /> Logging in...
+                  <Spinner /> Please wait...
                 </>
               ) : (
-                "Log in"
+                "Register"
               )}
             </Button>
           </Field>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState,useEffect } from "react";
 import { SummaryCard } from "@/components/SummaryCard";
 import { TableCard } from "@/components/TableCard";
 import { AppCard } from "@/components/Card";
@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
 import { AppDialog } from "@/components/AppDialog";
 import { DialogClose } from "@/components/ui/dialog";
+import { ErrorCard } from "@/components/ErrorCard";
 
 import { TransactionForm } from "@/components/forms/TransactionForm";
 
@@ -25,11 +26,9 @@ export function Dashboard() {
   async function fetchDashboard() {
     try {
       const response = await api.get("/dashboard");
-      const categoryResponse = await api.get("/categories");
 
       setDashboardError(null);
       setData(response.data.data);
-      setCategories(categoryResponse.data.data);
     } catch (error) {
       setDashboardError(error);
     } finally {
@@ -37,13 +36,34 @@ export function Dashboard() {
     }
   }
 
-  useEffect(() => {
-    const timeoutId = window.setTimeout(() => {
-      void fetchDashboard();
-    }, 0);
+  async function fetchCategories() {
+    try {
+      const categoryResponse = await api.get("/categories");
+      setCategories(categoryResponse.data.data);
+    } catch (error) {
+      console.error("Unable to load categories", error);
+    }
+  }
 
-    return () => window.clearTimeout(timeoutId);
+  useEffect(() => {
+    fetchDashboard();
   }, []);
+
+  function handleExpenseOpenChange(next) {
+    setExpenseOpen(next);
+
+    if (next) {
+      fetchCategories();
+    }
+  }
+
+  function handleIncomeOpenChange(next) {
+    setIncomeOpen(next);
+
+    if (next) {
+      fetchCategories();
+    }
+  }
 
   const recentHeaders = [
     {
@@ -115,9 +135,10 @@ export function Dashboard() {
 
   if (dashboardError) {
     return (
-      <div className="alert alert-error">
-        <span>Unable to load the dashboard. Please try again.</span>
-      </div>
+      <ErrorCard
+        title="Unable to load dashboard data"
+        message="Please try again later."
+      />
     );
   }
 
@@ -131,7 +152,7 @@ export function Dashboard() {
             <ButtonGroup className={"w-full"}>
               <AppDialog
                 open={expenseOpen}
-                onOpenChange={setExpenseOpen}
+                onOpenChange={handleExpenseOpenChange}
                 trigger={
                   <Button
                     variant="outline"
@@ -161,7 +182,7 @@ export function Dashboard() {
               </AppDialog>
               <AppDialog
                 open={incomeOpen}
-                onOpenChange={setIncomeOpen}
+                onOpenChange={handleIncomeOpenChange}
                 trigger={
                   <Button
                     variant="outline"

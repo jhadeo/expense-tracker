@@ -27,15 +27,26 @@ export function TableCard({ title, rows, className, headers }) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {rows.map((row) => (
-              <TableRow key={row.id}>
-                {headers.map((header) => (
-                  <TableCell key={header.key} className="text-center">
-                    {header.render ? header.render(row) : row[header.key]}
-                  </TableCell>
-                ))}
+            {rows.length > 0 ? (
+              rows.map((row) => (
+                <TableRow key={row.id}>
+                  {headers.map((header) => (
+                    <TableCell key={header.key} className="text-center">
+                      {header.render ? header.render(row) : row[header.key]}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={headers.length}
+                  className="h-24 text-center text-muted-foreground"
+                >
+                  No records found.
+                </TableCell>
               </TableRow>
-            ))}
+            )}
           </TableBody>
         </Table>
       </CardContent>

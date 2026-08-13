@@ -3,6 +3,7 @@ import { Dashboard } from "./pages/Dashboard";
 import { Expenses } from "./pages/Expenses";
 import { Incomes } from "./pages/Incomes";
 import { Categories } from "./pages/Categories";
+import { Register } from "./pages/auth/Register";
 import { Routes, Route, Navigate } from "react-router-dom";
 import AuthLayout from "./layouts/AuthLayout";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -12,7 +13,8 @@ function App() {
   return (
     <Routes>
       <Route path="/" element={<Navigate to="/login" replace />} />
-      <Route path="/login" element={<Login />}></Route>
+      <Route path="/login" element={<Login />}/>
+      <Route path="/register" element={<Register />}/>
 
       <Route element={<ProtectedRoute/>}>
         <Route element={<AuthLayout/>}>

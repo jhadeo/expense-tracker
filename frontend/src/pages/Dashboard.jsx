@@ -18,6 +18,7 @@ export function Dashboard() {
   const [data, setData] = useState(null);
   const [categories, setCategories] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [dashboardError, setDashboardError] = useState(null);
   const [incomeOpen, setIncomeOpen] = useState(false);
   const [expenseOpen, setExpenseOpen] = useState(false);
 
@@ -26,17 +27,22 @@ export function Dashboard() {
       const response = await api.get("/dashboard");
       const categoryResponse = await api.get("/categories");
 
+      setDashboardError(null);
       setData(response.data.data);
       setCategories(categoryResponse.data.data);
     } catch (error) {
-      console.error(error);
+      setDashboardError(error);
     } finally {
       setLoading(false);
     }
   }
 
   useEffect(() => {
-    fetchDashboard();
+    const timeoutId = window.setTimeout(() => {
+      void fetchDashboard();
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
   }, []);
 
   const recentHeaders = [
@@ -103,6 +109,14 @@ export function Dashboard() {
         <div className="col-span-2">
           <TableSkeleton />
         </div>
+      </div>
+    );
+  }
+
+  if (dashboardError) {
+    return (
+      <div className="alert alert-error">
+        <span>Unable to load the dashboard. Please try again.</span>
       </div>
     );
   }

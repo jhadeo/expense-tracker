@@ -47,9 +47,7 @@ export function LoginForm() {
           type: "server",
           message: "Invalid email or password.",
         });
-      }
-
-      if (error.response?.status === 422) {
+      } else if (error.response?.status === 422) {
         const serverErrors = error.response.data.errors;
 
         Object.entries(serverErrors).forEach(([field, messages]) => {
@@ -57,6 +55,11 @@ export function LoginForm() {
             type: "server",
             message: messages[0],
           });
+        });
+      } else {
+        setError("root", {
+          type: "server",
+          message: "Login failed. Please try again.",
         });
       }
     }

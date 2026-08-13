@@ -18,6 +18,7 @@ export function Categories() {
 
   async function fetchCategories() {
     try {
+      setError(null);
       const response = await api.get("/categories");
       setCategories(response.data);
     } catch {

@@ -62,9 +62,7 @@ export function CategoryForm({ onSuccess, onClose, initialData }) {
           message:
             "You are not authorized to perform this action."
         });
-      }
-
-      if (error.response?.status === 422) {
+      } else if (error.response?.status === 422) {
         const serverErrors = error.response.data.errors;
 
         Object.entries(serverErrors).forEach(([field, messages]) => {
@@ -72,6 +70,11 @@ export function CategoryForm({ onSuccess, onClose, initialData }) {
             type: "server",
             message: messages[0],
           });
+        });
+      } else {
+        setError("root", {
+          type: "server",
+          message: "An unexpected server error occurred. Please try again.",
         });
       }
     }
@@ -81,7 +84,7 @@ export function CategoryForm({ onSuccess, onClose, initialData }) {
     <form onSubmit={handleSubmit(onSubmit)}>
       <FieldGroup>
         <Field>
-          <FieldLabel htmlFor="title">Name</FieldLabel>
+          <FieldLabel htmlFor="name">Name</FieldLabel>
           <Input
             type="text"
             id="name"
@@ -128,7 +131,7 @@ export function CategoryForm({ onSuccess, onClose, initialData }) {
       )}
 
       <DialogFooter className={"mt-4"}>
-        <DialogClose render={<Button variant="outline">Cancel</Button>} />
+        <DialogClose render={<Button variant="outline" type="button">Cancel</Button>} />
         <Button type="submit" disabled={isSubmitting}>
           {isSubmitting ? (
             <>

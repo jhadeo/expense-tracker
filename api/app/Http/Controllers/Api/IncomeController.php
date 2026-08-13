@@ -24,13 +24,15 @@ class IncomeController extends Controller
             ->latest()
             ->paginate(15);
 
+        $now = Carbon::now();
+
         $summary = [
             'sum' => number_format($user->incomes()->sum('amount'), 2, '.', ''),
             'this_week' => number_format(
                 $user->incomes()
                     ->whereBetween('date', [
-                        Carbon::now()->startOfWeek(),
-                        Carbon::now()->endOfWeek(),
+                        $now->startOfWeek(),
+                        $now->endOfWeek(),
                     ])
                     ->sum('amount'),
                 2,
@@ -40,8 +42,8 @@ class IncomeController extends Controller
             'this_month' => number_format(
                 $user->incomes()
                     ->whereBetween('date', [
-                        Carbon::now()->startOfMonth(),
-                        Carbon::now()->endOfMonth(),
+                        $now->startOfMonth(),
+                        $now->endOfMonth(),
                     ])
                     ->sum('amount'),
                 2,

@@ -98,9 +98,7 @@ export function TransactionForm({
           message:
             "You are not authorized to complete this transaction. Please relogin to try again.",
         });
-      }
-
-      if (error.response?.status === 422) {
+      } else if (error.response?.status === 422) {
         const serverErrors = error.response.data.errors;
 
         Object.entries(serverErrors).forEach(([field, messages]) => {
@@ -108,6 +106,11 @@ export function TransactionForm({
             type: "server",
             message: messages[0],
           });
+        });
+      } else {
+        setError("root", {
+          type: "server",
+          message: "Transaction request failed. Please try again.",
         });
       }
     }
@@ -214,7 +217,7 @@ export function TransactionForm({
       )}
 
       <DialogFooter className={"mt-4"}>
-        <DialogClose render={<Button variant="outline">Cancel</Button>} />
+        <DialogClose render={<Button variant="outline" type="button">Cancel</Button>} />
         <Button type="submit" disabled={isSubmitting}>
           {isSubmitting ? (
             <>

@@ -130,6 +130,7 @@ export function CategoryActions({ category, onRefresh, disabled }) {
         }}
       >
         <CategoryForm
+          title={`Edit ${category.name}`}
           onSuccess={onRefresh}
           onClose={() => setOpenEdit(false)}
           initialData={{

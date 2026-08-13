@@ -32,9 +32,9 @@ export function TransactionActions({
     setDeleting(true);
     setError(null);
     try {
-      await api.delete(`/${type}s/${transaction.id}`);
-      setOpenDelete(false);
-      onRefresh?.();
+      const endpoint = type === "income" ? "/incomes" : "/expenses";
+      await api.delete(`${endpoint}/${transaction.id}`);
+      setOpenDelete(false);      onRefresh?.();
     } catch (err) {
       setError(
         err?.response?.data?.message ?? "Failed to delete. Please try again.",
@@ -132,6 +132,7 @@ export function TransactionActions({
       >
         <TransactionForm
           type={type}
+          title={`Edit ${transaction.title}`}
           categories={categories}
           onSuccess={onRefresh}
           onClose={() => setOpenEdit(false)}

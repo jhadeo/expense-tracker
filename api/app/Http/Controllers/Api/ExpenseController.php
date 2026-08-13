@@ -21,13 +21,15 @@ class ExpenseController extends Controller
             ->latest()
             ->paginate(15);
 
+        $now = Carbon::now();
+
         $summary = [
             'sum' => number_format($user->expenses()->sum('amount'), 2, '.', ''),
             'this_week' => number_format(
                 $user->expenses()
                     ->whereBetween('date', [
-                        Carbon::now()->startOfWeek(),
-                        Carbon::now()->endOfWeek(),
+                        $now->copy()->startOfWeek(),
+                        $now->copy()->endOfWeek(),
                     ])
                     ->sum('amount'),
                 2,
@@ -37,8 +39,8 @@ class ExpenseController extends Controller
             'this_month' => number_format(
                 $user->expenses()
                     ->whereBetween('date', [
-                        Carbon::now()->startOfMonth(),
-                        Carbon::now()->endOfMonth(),
+                        $now->copy()->startOfMonth(),
+                        $now->copy()->endOfMonth(),
                     ])
                     ->sum('amount'),
                 2,

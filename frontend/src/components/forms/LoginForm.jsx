@@ -17,6 +17,7 @@ import { Spinner } from "@/components/ui/spinner";
 
 import { loginSchema } from "@/schemas/loginSchema";
 import api from "@/api/axios";
+import { handleApiFormError } from "@/lib/utils";
 
 export function LoginForm() {
   const {
@@ -42,34 +43,18 @@ export function LoginForm() {
 
       navigate("/dashboard");
     } catch (error) {
-      if (error.response?.status === 401) {
-        setError("root", {
-          type: "server",
-          message: "Invalid email or password.",
-        });
-      } else if (error.response?.status === 422) {
-        const serverErrors = error.response.data.errors;
-
-        Object.entries(serverErrors).forEach(([field, messages]) => {
-          setError(field, {
-            type: "server",
-            message: messages[0],
-          });
-        });
-      } else {
-        setError("root", {
-          type: "server",
-          message: "Login failed. Please try again.",
-        });
-      }
+      handleApiFormError({
+        error,
+        setError,
+        defaultMessage: "Login failed. Please try again.",
+        unauthorizedMessage:
+          "Invalid email or password.",
+      });
     }
   }
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      className="mx-auto w-full max-w-sm"
-    >
+    <form onSubmit={handleSubmit(onSubmit)} className="mx-auto w-full max-w-sm">
       <Card>
         <CardHeader>
           <CardTitle className="text-center">Login</CardTitle>

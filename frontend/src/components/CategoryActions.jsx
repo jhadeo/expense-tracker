@@ -13,8 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { AppDialog } from "@/components/AppDialog";
 import { CategoryForm } from "./forms/CategoryForm";
-
-import api from "@/api/axios";
+import { deleteResource } from "@/api/transactions";
 
 export function CategoryActions({ category, onRefresh, disabled }) {
   const [openDelete, setOpenDelete] = useState(false);
@@ -27,7 +26,7 @@ export function CategoryActions({ category, onRefresh, disabled }) {
     setDeleting(true);
     setError(null);
     try {
-      await api.delete(`/categories/${category.id}`);
+      deleteResource("categories", category.id)
       setOpenDelete(false);
       onRefresh?.();
     } catch (err) {

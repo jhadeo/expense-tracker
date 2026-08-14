@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
-import { DataTable } from "@/components/DataTable";
+import { DataTable } from "@/components/tables/DataTable";
 import { getCategoryColumns } from "@/components/columns/categories";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 import { TableSkeleton } from "@/components/skeleton/table-skeleton";
 import { Button } from "@/components/ui/button";
 import { AppDialog } from "@/components/AppDialog";
-import { ErrorCard } from "@/components/ErrorCard";
+import { ErrorCard } from "@/components/cards/ErrorCard";
 
 import api from "../api/axios";
 import { CategoryForm } from "@/components/forms/CategoryForm";

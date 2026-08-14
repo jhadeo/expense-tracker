@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/table";
 
 import { useState } from "react";
-import { Button } from "./ui/button";
+import { Button } from "../ui/button";
 
 const features = tableFeatures({
   columnFilteringFeature,

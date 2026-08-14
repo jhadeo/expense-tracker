@@ -15,6 +15,7 @@ import { Controller, useForm } from "react-hook-form";
 import { useEffect } from "react";
 import { categorySchema } from "@/schemas/categorySchema";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { handleApiFormError } from "@/lib/utils";
 import api from "@/api/axios";
 
 export function CategoryForm({ onSuccess, onClose, initialData }) {
@@ -56,27 +57,13 @@ export function CategoryForm({ onSuccess, onClose, initialData }) {
         reset();
       }
     } catch (error) {
-      if (error.response?.status === 401) {
-        setError("root", {
-          type: "server",
-          message:
-            "You are not authorized to perform this action."
-        });
-      } else if (error.response?.status === 422) {
-        const serverErrors = error.response.data.errors;
-
-        Object.entries(serverErrors).forEach(([field, messages]) => {
-          setError(field, {
-            type: "server",
-            message: messages[0],
-          });
-        });
-      } else {
-        setError("root", {
-          type: "server",
-          message: "An unexpected server error occurred. Please try again.",
-        });
-      }
+      handleApiFormError({
+        error,
+        setError,
+        defaultMessage: "Category request failed. Please try again.",
+        unauthorizedMessage:
+          "You are not authorized to complete this transaction. Please relogin to try again.",
+      });
     }
   }
 
@@ -131,7 +118,13 @@ export function CategoryForm({ onSuccess, onClose, initialData }) {
       )}
 
       <DialogFooter className={"mt-4"}>
-        <DialogClose render={<Button variant="outline" type="button">Cancel</Button>} />
+        <DialogClose
+          render={
+            <Button variant="outline" type="button">
+              Cancel
+            </Button>
+          }
+        />
         <Button type="submit" disabled={isSubmitting}>
           {isSubmitting ? (
             <>

@@ -13,8 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { AppDialog } from "@/components/AppDialog";
 import { TransactionForm } from "./forms/TransactionForm";
-
-import api from "@/api/axios";
+import { deleteResource } from "@/api/transactions";
 
 export function TransactionActions({
   transaction,
@@ -33,8 +32,9 @@ export function TransactionActions({
     setError(null);
     try {
       const endpoint = type === "income" ? "/incomes" : "/expenses";
-      await api.delete(`${endpoint}/${transaction.id}`);
-      setOpenDelete(false);      onRefresh?.();
+      deleteResource(endpoint, transaction.id);
+      setOpenDelete(false);
+      onRefresh?.();
     } catch (err) {
       setError(
         err?.response?.data?.message ?? "Failed to delete. Please try again.",

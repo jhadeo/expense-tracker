@@ -1,12 +1,12 @@
 import { useState,useEffect } from "react";
-import { SummaryCard } from "@/components/SummaryCard";
-import { TableCard } from "@/components/TableCard";
-import { AppCard } from "@/components/Card";
+import { SummaryCard } from "@/components/cards/SummaryCard";
+import { TableCard } from "@/components/tables/TableCard";
+import { AppCard } from "@/components/cards/Card";
 import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
 import { AppDialog } from "@/components/AppDialog";
 import { DialogClose } from "@/components/ui/dialog";
-import { ErrorCard } from "@/components/ErrorCard";
+import { ErrorCard } from "@/components/cards/ErrorCard";
 
 import { TransactionForm } from "@/components/forms/TransactionForm";
 

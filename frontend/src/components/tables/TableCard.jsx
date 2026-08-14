@@ -28,8 +28,8 @@ export function TableCard({ title, rows, className, headers }) {
           </TableHeader>
           <TableBody>
             {rows.length > 0 ? (
-              rows.map((row) => (
-                <TableRow key={row.id}>
+              rows.map((row, index) => (
+                <TableRow key={row.id ?? index}>
                   {headers.map((header) => (
                     <TableCell key={header.key} className="text-center">
                       {header.render ? header.render(row) : row[header.key]}

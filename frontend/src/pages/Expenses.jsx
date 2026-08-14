@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import { DataTable } from "@/components/DataTable";
+import { DataTable } from "@/components/tables/DataTable";
 import { getTransactionColumns } from "@/components/columns/transactions";
-import { SummaryCard } from "@/components/SummaryCard";
+import { SummaryCard } from "@/components/cards/SummaryCard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 import { SummaryCardSkeleton } from "@/components/skeleton/summarycard-skeleton";

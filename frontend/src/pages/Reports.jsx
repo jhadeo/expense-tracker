@@ -13,6 +13,8 @@ import { Card, CardTitle } from "@/components/ui/card";
 
 import { SummaryCard } from "@/components/cards/SummaryCard";
 import { IncomeExpenseChart } from "@/components/IncomeExpenseChart";
+import { Button } from "@/components/ui/button";
+import { ReportTable } from "@/components/tables/ReportTable";
 
 export function Reports() {
   const today = new Date();
@@ -22,6 +24,7 @@ export function Reports() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [transactionFilter, setTransactionFilter] = useState("all");
 
   const months = [
     { label: "January", value: 1 },
@@ -39,6 +42,8 @@ export function Reports() {
   ];
 
   const currentYear = new Date().getFullYear();
+  const monthLabel = months.find((item) => item.value === month)?.label;
+  const selectedMonthLabel = months.find((item) => item.value === month)?.label ?? "Select month";
 
   const years = Array.from({ length: 6 }, (_, index) => {
     const year = currentYear - index;
@@ -48,6 +53,30 @@ export function Reports() {
       value: year,
     };
   });
+
+  const selectedYearLabel = years.find((item) => item.value === year)?.label ?? "Select year";
+
+  const headers = [
+    {
+      key: "title",
+      label: "Title",
+    },
+    {
+      key: "amount",
+      label: "Amount",
+      render: (row) => `₱${row.amount}`,
+    },
+    {
+      key: "date",
+      label: "Date",
+      render: (row) =>
+        new Date(row.date).toLocaleDateString("en-US", {
+          month: "2-digit",
+          day: "2-digit",
+          year: "2-digit",
+        }),
+    },
+  ];
 
   useEffect(() => {
     async function fetchReport() {
@@ -85,40 +114,49 @@ export function Reports() {
       </div>
     );
   }
-
+  const rows =
+    transactionFilter === "all"
+      ? [...data.income, ...data.expenses]
+      : transactionFilter === "income"
+        ? data.income
+        : data.expenses;
   return (
     <div className="flex flex-col md:grid md:grid-cols-3 gap-4">
-      <div className="col-span-3">
-        <Card className={"flex flex-row justify-center-safe"}>
-          <Select items={months} itemToStringValue={(item) => item.label}>
-            <SelectTrigger>
-              <SelectValue placeholder="Select month" />
-            </SelectTrigger>
+      <Card className="flex flex-row justify-center-safe gap-2 p-4 col-span-3">
+        <Select
+          value={month.toString()}
+          onValueChange={(value) => setMonth(Number(value))}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Select month">{selectedMonthLabel}</SelectValue>
+          </SelectTrigger>
 
-            <SelectContent>
-              {months.map((month) => (
-                <SelectItem key={month.value} value={month}>
-                  {month.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <SelectContent>
+            {months.map((month) => (
+              <SelectItem key={month.value} value={month.value.toString()}>
+                {month.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
 
-          <Select items={years} itemToStringValue={(item) => item.label}>
-            <SelectTrigger>
-              <SelectValue placeholder="Select year" />
-            </SelectTrigger>
+        <Select
+          value={year.toString()}
+          onValueChange={(value) => setYear(Number(value))}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Select year">{selectedYearLabel}</SelectValue>
+          </SelectTrigger>
 
-            <SelectContent>
-              {years.map((year) => (
-                <SelectItem key={year.value} value={year}>
-                  {year.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </Card>
-      </div>
+          <SelectContent>
+            {years.map((year) => (
+              <SelectItem key={year.value} value={year.value.toString()}>
+                {year.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </Card>
 
       <SummaryCard
         title={"Income"}
@@ -147,10 +185,33 @@ export function Reports() {
 
       <Card className="col-span-3 p-4">
         <CardTitle className="text-base md:text-2xl text-center m-4">
-          Category Report
+          Your transactions this {monthLabel} {year}
         </CardTitle>
+        <div className="flex gap-2">
+          <div className="flex gap-2">
+            <Button
+              variant={transactionFilter === "all" ? "default" : "outline"}
+              onClick={() => setTransactionFilter("all")}
+            >
+              All
+            </Button>
 
-        <TableSkeleton />
+            <Button
+              variant={transactionFilter === "income" ? "default" : "outline"}
+              onClick={() => setTransactionFilter("income")}
+            >
+              Income
+            </Button>
+
+            <Button
+              variant={transactionFilter === "expenses" ? "default" : "outline"}
+              onClick={() => setTransactionFilter("expenses")}
+            >
+              Expenses
+            </Button>
+          </div>
+        </div>
+        <ReportTable headers={headers} rows={rows} />
       </Card>
     </div>
   );

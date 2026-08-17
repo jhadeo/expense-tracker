@@ -28,7 +28,7 @@ export function IncomeExpenseChart({ report }) {
   ];
 
   return (
-    <ChartContainer config={chartConfig} className="h-[180px] w-full">
+    <ChartContainer config={chartConfig} className="h-40 w-full">
       <BarChart accessibilityLayer data={chartData} layout="vertical">
         <CartesianGrid horizontal={false} />
 

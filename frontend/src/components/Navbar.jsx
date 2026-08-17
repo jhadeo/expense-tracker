@@ -53,6 +53,12 @@ export default function Navbar() {
           </NavigationMenuItem>
 
           <NavigationMenuItem>
+            <NavigationMenuLink render={<Link to={"/reports"} />}>
+              Reports
+            </NavigationMenuLink>
+          </NavigationMenuItem>
+
+          <NavigationMenuItem>
             <NavigationMenuTrigger>Account</NavigationMenuTrigger>
             <NavigationMenuContent>
               <NavigationMenuLink onClick={handleLogout}>

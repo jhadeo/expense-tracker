@@ -4,6 +4,7 @@ import { Expenses } from "./pages/Expenses";
 import { Incomes } from "./pages/Incomes";
 import { Categories } from "./pages/Categories";
 import { Register } from "./pages/auth/Register";
+import { Reports } from "./pages/Reports";
 import { Routes, Route, Navigate } from "react-router-dom";
 import AuthLayout from "./layouts/AuthLayout";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -22,6 +23,7 @@ function App() {
           <Route path="/expenses" element={<Expenses />} />
           <Route path="/incomes" element={<Incomes />} />
            <Route path="/categories" element={<Categories />} />
+           <Route path="/reports" element={<Reports />} />
         </Route>
       </Route>
 

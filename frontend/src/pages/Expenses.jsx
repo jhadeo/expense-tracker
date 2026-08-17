@@ -40,6 +40,7 @@ export function Expenses() {
 
   useEffect(() => {
     fetchExpensesPageData();
+    fetchCategories();
   }, []);
 
   function handleExpenseOpenChange(next) {

@@ -46,9 +46,13 @@ export function TransactionForm({
   });
 
   useEffect(() => {
-    if (initialData) {
-      reset(initialData);
-    }
+    if (!initialData) return;
+
+    reset({
+      ...initialData,
+      category_id: initialData.category_id?.toString() ?? "",
+      amount: Number(initialData.amount),
+    });
   }, [initialData, reset]);
 
   const systemCategories =
@@ -68,7 +72,7 @@ export function TransactionForm({
       })) ?? [];
 
   const allCategories = [
-    { label: "Select a category", value: null },
+    { label: "Select a category", value: "" },
     ...systemCategories,
     ...userCategories,
   ];
@@ -151,11 +155,11 @@ export function TransactionForm({
             render={({ field }) => (
               <Select
                 items={allCategories}
-                value={field.value}
+                value={field.value ?? ""}
                 onValueChange={field.onChange}
               >
                 <SelectTrigger>
-                  <SelectValue />
+                  <SelectValue placeholder="Select a category" />
                 </SelectTrigger>
                 <SelectContent alignItemWithTrigger={false}>
                   <SelectGroup>
@@ -174,7 +178,7 @@ export function TransactionForm({
                       userCategories.map((item) => (
                         <SelectItem
                           key={item.value}
-                          value={item.value.toString()}
+                          value={item.value}
                         >
                           {item.label}
                         </SelectItem>

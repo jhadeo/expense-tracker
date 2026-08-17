@@ -32,7 +32,7 @@ export function TransactionActions({
     setError(null);
     try {
       const endpoint = type === "income" ? "/incomes" : "/expenses";
-      deleteResource(endpoint, transaction.id);
+      await deleteResource(endpoint, transaction.id);
       setOpenDelete(false);
       onRefresh?.();
     } catch (err) {

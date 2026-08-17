@@ -40,6 +40,7 @@ export function Incomes() {
 
   useEffect(() => {
     fetchIncomesPageData();
+    fetchCategories();
   }, []);
 
   function handleIncomeOpenChange(next) {

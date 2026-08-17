@@ -19,6 +19,11 @@ import { handleApiFormError } from "@/lib/utils";
 import api from "@/api/axios";
 
 export function CategoryForm({ onSuccess, onClose, initialData }) {
+  const typeOptions = [
+    { label: "Income", value: "income" },
+    { label: "Expenses", value: "expenses" },
+  ];
+
   const {
     register,
     handleSubmit,
@@ -88,17 +93,20 @@ export function CategoryForm({ onSuccess, onClose, initialData }) {
             name="type"
             control={control}
             render={({ field }) => (
-              <Select value={field.value} onValueChange={field.onChange}>
+              <Select
+                items={typeOptions}
+                value={field.value ?? ""}
+                onValueChange={field.onChange}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Select a type" />
                 </SelectTrigger>
                 <SelectContent alignItemWithTrigger={false}>
-                  <SelectItem key={"income"} value={"income"}>
-                    Income
-                  </SelectItem>
-                  <SelectItem key={"expenses"} value={"expenses"}>
-                    Expenses
-                  </SelectItem>
+                  {typeOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             )}

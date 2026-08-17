@@ -99,6 +99,12 @@ class CategoryController extends Controller
             abort(404);
         }
 
+        if ($category->expenses()->exists() || $category->incomes()->exists()) {
+            return response()->json([
+                'message' => 'Category cannot be deleted because it has transactions.',
+            ], 409);
+        }
+
         $category->delete();
 
         return response()->json([

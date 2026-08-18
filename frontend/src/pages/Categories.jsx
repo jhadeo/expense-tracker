@@ -18,6 +18,7 @@ export function Categories() {
   const [categoryOpen, setCategoryOpen] = useState(false);
 
   async function fetchCategories() {
+    setLoading(true);
     try {
       setError(null);
       const response = await api.get("/categories");

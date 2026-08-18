@@ -25,10 +25,21 @@ export function Reports() {
 
   const [month, setMonth] = useState(today.getMonth() + 1);
   const [year, setYear] = useState(today.getFullYear());
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+  const [categories, setCategories] = useState([]);
+  const [data, setData] = useState({
+    income: [],
+    expenses: [],
+    total_income: 0,
+    total_expenses: 0,
+    balance: 0,
+  });
+  const [reportLoading, setReportLoading] = useState(true);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
+  const [reportError, setReportError] = useState(null);
   const [transactionFilter, setTransactionFilter] = useState("all");
+  const [categoryId, setCategoryId] = useState(0);
+  const [catReport, setCatReport] = useState(null);
+  const [categoryReportLoading, setCategoryReportLoading] = useState(false);
 
   const months = [
     { label: "January", value: 1 },
@@ -62,9 +73,9 @@ export function Reports() {
   const selectedYearLabel =
     years.find((item) => item.value === year)?.label ?? "Select year";
 
-    async function fetchReport() {
-    setLoading(true);
-    setError(null);
+  async function fetchReport() {
+    setReportLoading(true);
+    setReportError(null);
 
     try {
       const response = await api.get("/reports/monthly", {
@@ -76,9 +87,44 @@ export function Reports() {
 
       setData(response.data.data);
     } catch {
-      setError("Unable to load report. Please try again.");
+      setReportError("Unable to load report. Please try again.");
     } finally {
-      setLoading(false);
+      setReportLoading(false);
+    }
+  }
+
+  async function fetchCategories() {
+    setCategoriesLoading(true);
+    try {
+      const response = await api.get("/categories");
+      setCategories(response.data.data ?? []);
+    } catch {
+      setCategories([]);
+    } finally {
+      setCategoriesLoading(false);
+    }
+  }
+
+  async function fetchCategoryReport() {
+    if (categoryId === 0) {
+      setCatReport(null);
+      return;
+    }
+
+    setCategoryReportLoading(true);
+    try {
+      const response = await api.get("/reports/category", {
+        params: {
+          id: categoryId,
+          month,
+          year,
+        },
+      });
+      setCatReport(response.data.data);
+    } catch {
+      setCatReport(null);
+    } finally {
+      setCategoryReportLoading(false);
     }
   }
 
@@ -86,7 +132,17 @@ export function Reports() {
     fetchReport();
   }, [month, year]);
 
-  if (loading) {
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  useEffect(() => {
+    fetchCategoryReport();
+  }, [month, year, categoryId]);
+
+  const isInitialLoading = reportLoading && categoriesLoading;
+
+  if (isInitialLoading) {
     return (
       <div className="flex flex-col md:grid md:grid-cols-3 gap-4">
         <Card className="flex flex-row justify-center-safe gap-2 p-4 col-span-3">
@@ -106,7 +162,7 @@ export function Reports() {
       </div>
     );
   }
-    if (error) {
+  if (reportError) {
     return (
       <ErrorCard
         title="Unable to load report"
@@ -118,10 +174,13 @@ export function Reports() {
 
   const rows =
     transactionFilter === "all"
-      ? [...data.income, ...data.expenses]
+      ? [...(data?.income ?? []), ...(data?.expenses ?? [])]
       : transactionFilter === "income"
-        ? data.income
-        : data.expenses;
+        ? data?.income ?? []
+        : data?.expenses ?? [];
+
+  const selectedCategory = categories.find((category) => category.id === categoryId);
+
   return (
     <div className="flex flex-col md:grid md:grid-cols-3 gap-4">
       <Card className="flex flex-row justify-center-safe gap-2 p-4 col-span-3">
@@ -187,6 +246,68 @@ export function Reports() {
         <div className="p-8">
           <IncomeExpenseChart report={data} />
         </div>
+      </Card>
+
+      <Card className={"col-span-3 p-4"}>
+        <CardTitle className={"text-base md:text-2xl text-center"}>
+          Category Report
+        </CardTitle>
+        <div className="flex gap-2 justify-around mt-4">
+          <Select
+            value={selectedCategory ? selectedCategory.name : undefined}
+            onValueChange={(value) => {
+              const matchedCategory = categories.find(
+                (category) => category.name === value,
+              );
+
+              setCategoryId(matchedCategory ? matchedCategory.id : 0);
+            }}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select category" />
+            </SelectTrigger>
+
+            <SelectContent>
+              {categories.map((category) => (
+                <SelectItem key={category.id} value={category.name}>
+                  {category.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {categoryReportLoading ? (
+          <div className="mt-4 space-y-2">
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-full" />
+          </div>
+        ) : catReport ? (
+          <div className="mt-4 space-y-2 text-sm md:text-base">
+            <p>
+              <span className="font-medium">Category Name:</span>{" "}
+              {catReport.category.name}
+            </p>
+            <p>
+              <span className="font-medium">Category Type:</span>{" "}
+              {catReport.category.type}
+            </p>
+            <p>
+              <span className="font-medium">
+                Transactions with {catReport.category.name}:
+              </span>{" "}
+              {catReport.transaction_count}
+            </p>
+            <p>
+              <span className="font-medium">Total Amount:</span>{" "}
+              ₱{catReport.total_amount}
+            </p>
+          </div>
+        ) : (
+          <p className="mt-4 text-center text-sm text-muted-foreground">
+            Select a category to view its report.
+          </p>
+        )}
       </Card>
 
       <Card className="col-span-3 p-4">

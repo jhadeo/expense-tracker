@@ -18,6 +18,7 @@ import { SummaryCard } from "@/components/cards/SummaryCard";
 import { IncomeExpenseChart } from "@/components/IncomeExpenseChart";
 import { Button } from "@/components/ui/button";
 import { getReportColumns } from "@/components/columns/report-monthly";
+import { getCategoryReportColumns } from "@/components/columns/report-category";
 import { DataTable } from "@/components/tables/DataTable";
 
 export function Reports() {
@@ -176,10 +177,12 @@ export function Reports() {
     transactionFilter === "all"
       ? [...(data?.income ?? []), ...(data?.expenses ?? [])]
       : transactionFilter === "income"
-        ? data?.income ?? []
-        : data?.expenses ?? [];
+        ? (data?.income ?? [])
+        : (data?.expenses ?? []);
 
-  const selectedCategory = categories.find((category) => category.id === categoryId);
+  const selectedCategory = categories.find(
+    (category) => category.id === categoryId,
+  );
 
   return (
     <div className="flex flex-col md:grid md:grid-cols-3 gap-4">
@@ -248,6 +251,37 @@ export function Reports() {
         </div>
       </Card>
 
+      <Card className="col-span-3 p-4">
+        <CardTitle className="text-base md:text-2xl text-center m-4">
+          Your transactions this {monthLabel} {year}
+        </CardTitle>
+        <div className="flex gap-2">
+          <div className="flex gap-2">
+            <Button
+              variant={transactionFilter === "all" ? "default" : "outline"}
+              onClick={() => setTransactionFilter("all")}
+            >
+              All
+            </Button>
+
+            <Button
+              variant={transactionFilter === "income" ? "default" : "outline"}
+              onClick={() => setTransactionFilter("income")}
+            >
+              Income
+            </Button>
+
+            <Button
+              variant={transactionFilter === "expenses" ? "default" : "outline"}
+              onClick={() => setTransactionFilter("expenses")}
+            >
+              Expenses
+            </Button>
+          </div>
+        </div>
+        <DataTable data={rows} columns={getReportColumns()} />
+      </Card>
+
       <Card className={"col-span-3 p-4"}>
         <CardTitle className={"text-base md:text-2xl text-center"}>
           Category Report
@@ -283,62 +317,34 @@ export function Reports() {
             <Skeleton className="h-10 w-full" />
           </div>
         ) : catReport ? (
-          <div className="mt-4 space-y-2 text-sm md:text-base">
-            <p>
-              <span className="font-medium">Category Name:</span>{" "}
-              {catReport.category.name}
-            </p>
-            <p>
-              <span className="font-medium">Category Type:</span>{" "}
-              {catReport.category.type}
-            </p>
-            <p>
-              <span className="font-medium">
-                Transactions with {catReport.category.name}:
-              </span>{" "}
-              {catReport.transaction_count}
-            </p>
-            <p>
-              <span className="font-medium">Total Amount:</span>{" "}
-              ₱{catReport.total_amount}
-            </p>
-          </div>
+          <>
+            <div className="mt-4 space-y-2 text-sm md:text-base">
+              <p>
+                <span className="font-medium">Category:</span>{" "}
+                {catReport.category.name}
+              </p>
+              <p>
+                <span className="font-medium">Type:</span>{" "}
+                {catReport.category.type}
+              </p>
+              <p>
+                <span className="font-medium">
+                  Transactions with {catReport.category.name}:
+                </span>{" "}
+                {catReport.transaction_count}
+              </p>
+              <p>
+                <span className="font-medium">Total Amount:</span> ₱
+                {catReport.total_amount}
+              </p>
+            </div>
+            <DataTable data={catReport.transactions} columns={getCategoryReportColumns()}/>
+          </>
         ) : (
           <p className="mt-4 text-center text-sm text-muted-foreground">
             Select a category to view its report.
           </p>
         )}
-      </Card>
-
-      <Card className="col-span-3 p-4">
-        <CardTitle className="text-base md:text-2xl text-center m-4">
-          Your transactions this {monthLabel} {year}
-        </CardTitle>
-        <div className="flex gap-2">
-          <div className="flex gap-2">
-            <Button
-              variant={transactionFilter === "all" ? "default" : "outline"}
-              onClick={() => setTransactionFilter("all")}
-            >
-              All
-            </Button>
-
-            <Button
-              variant={transactionFilter === "income" ? "default" : "outline"}
-              onClick={() => setTransactionFilter("income")}
-            >
-              Income
-            </Button>
-
-            <Button
-              variant={transactionFilter === "expenses" ? "default" : "outline"}
-              onClick={() => setTransactionFilter("expenses")}
-            >
-              Expenses
-            </Button>
-          </div>
-        </div>
-        <DataTable data={rows} columns={getReportColumns()} />
       </Card>
     </div>
   );

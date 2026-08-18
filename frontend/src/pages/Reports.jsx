@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { SummaryCardSkeleton } from "@/components/skeleton/summarycard-skeleton";
 import { TableSkeleton } from "@/components/skeleton/table-skeleton";
+import { ChartSkeleton } from "@/components/skeleton/chart-skeleton";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Select,
   SelectContent,
@@ -10,11 +12,13 @@ import {
 } from "@/components/ui/select";
 import api from "@/api/axios";
 import { Card, CardTitle } from "@/components/ui/card";
+import { ErrorCard } from "@/components/cards/ErrorCard";
 
 import { SummaryCard } from "@/components/cards/SummaryCard";
 import { IncomeExpenseChart } from "@/components/IncomeExpenseChart";
 import { Button } from "@/components/ui/button";
-import { ReportTable } from "@/components/tables/ReportTable";
+import { getReportColumns } from "@/components/columns/report-monthly";
+import { DataTable } from "@/components/tables/DataTable";
 
 export function Reports() {
   const today = new Date();
@@ -23,7 +27,7 @@ export function Reports() {
   const [year, setYear] = useState(today.getFullYear());
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+    const [error, setError] = useState(null);
   const [transactionFilter, setTransactionFilter] = useState("all");
 
   const months = [
@@ -43,7 +47,8 @@ export function Reports() {
 
   const currentYear = new Date().getFullYear();
   const monthLabel = months.find((item) => item.value === month)?.label;
-  const selectedMonthLabel = months.find((item) => item.value === month)?.label ?? "Select month";
+  const selectedMonthLabel =
+    months.find((item) => item.value === month)?.label ?? "Select month";
 
   const years = Array.from({ length: 6 }, (_, index) => {
     const year = currentYear - index;
@@ -54,66 +59,63 @@ export function Reports() {
     };
   });
 
-  const selectedYearLabel = years.find((item) => item.value === year)?.label ?? "Select year";
+  const selectedYearLabel =
+    years.find((item) => item.value === year)?.label ?? "Select year";
 
-  const headers = [
-    {
-      key: "title",
-      label: "Title",
-    },
-    {
-      key: "amount",
-      label: "Amount",
-      render: (row) => `₱${row.amount}`,
-    },
-    {
-      key: "date",
-      label: "Date",
-      render: (row) =>
-        new Date(row.date).toLocaleDateString("en-US", {
-          month: "2-digit",
-          day: "2-digit",
-          year: "2-digit",
-        }),
-    },
-  ];
+    async function fetchReport() {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await api.get("/reports/monthly", {
+        params: {
+          month,
+          year,
+        },
+      });
+
+      setData(response.data.data);
+    } catch {
+      setError("Unable to load report. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  }
 
   useEffect(() => {
-    async function fetchReport() {
-      setLoading(true);
-      setError(null);
-
-      try {
-        const response = await api.get("/reports/monthly", {
-          params: {
-            month,
-            year,
-          },
-        });
-
-        setData(response.data.data);
-      } catch {
-        setError("Unable to load report. Please try again.");
-      } finally {
-        setLoading(false);
-      }
-    }
-
     fetchReport();
   }, [month, year]);
 
   if (loading) {
     return (
       <div className="flex flex-col md:grid md:grid-cols-3 gap-4">
+        <Card className="flex flex-row justify-center-safe gap-2 p-4 col-span-3">
+          <Skeleton className="h-8 w-40" />
+          <Skeleton className="h-8 w-40" />
+        </Card>
+
         <SummaryCardSkeleton />
         <SummaryCardSkeleton />
         <SummaryCardSkeleton />
+
+        <ChartSkeleton className="col-span-3" />
+
         <div className="col-span-3">
-          <TableSkeleton />
+          <TableSkeleton showAction />
         </div>
       </div>
     );
   }
+    if (error) {
+    return (
+      <ErrorCard
+        title="Unable to load report"
+        message="Please try again later."
+        onRetry={fetchReport}
+      />
+    );
+  }
+
   const rows =
     transactionFilter === "all"
       ? [...data.income, ...data.expenses]
@@ -128,7 +130,9 @@ export function Reports() {
           onValueChange={(value) => setMonth(Number(value))}
         >
           <SelectTrigger>
-            <SelectValue placeholder="Select month">{selectedMonthLabel}</SelectValue>
+            <SelectValue placeholder="Select month">
+              {selectedMonthLabel}
+            </SelectValue>
           </SelectTrigger>
 
           <SelectContent>
@@ -145,7 +149,9 @@ export function Reports() {
           onValueChange={(value) => setYear(Number(value))}
         >
           <SelectTrigger>
-            <SelectValue placeholder="Select year">{selectedYearLabel}</SelectValue>
+            <SelectValue placeholder="Select year">
+              {selectedYearLabel}
+            </SelectValue>
           </SelectTrigger>
 
           <SelectContent>
@@ -211,7 +217,7 @@ export function Reports() {
             </Button>
           </div>
         </div>
-        <ReportTable headers={headers} rows={rows} />
+        <DataTable data={rows} columns={getReportColumns()} />
       </Card>
     </div>
   );

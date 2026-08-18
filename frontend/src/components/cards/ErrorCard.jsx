@@ -1,4 +1,4 @@
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, RefreshCw } from "lucide-react";
 
 import {
   Card,
@@ -6,10 +6,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 export function ErrorCard({
   title = "Something went wrong",
   message = "An unexpected error occurred. Please try again.",
+  action,
+  onRetry,
 }) {
   return (
     <Card className="border-destructive">
@@ -19,7 +22,21 @@ export function ErrorCard({
       </CardHeader>
 
       <CardContent>
-        <p className="text-sm text-muted-foreground">{message}</p>
+        {message && (
+          <p className="text-sm text-muted-foreground">{message}</p>
+        )}
+        {action && <div className="mt-4">{action}</div>}
+        {!action && onRetry && (
+          <Button
+            variant="outline"
+            size="sm"
+            className="mt-4"
+            onClick={onRetry}
+          >
+            <RefreshCw className="mr-2 h-4 w-4" />
+            Retry
+          </Button>
+        )}
       </CardContent>
     </Card>
   );

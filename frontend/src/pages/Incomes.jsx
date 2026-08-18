@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { DataTable } from "@/components/tables/DataTable";
 import { getTransactionColumns } from "@/components/columns/transactions";
 import { SummaryCard } from "@/components/cards/SummaryCard";
+import { ErrorCard } from "@/components/cards/ErrorCard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 import { SummaryCardSkeleton } from "@/components/skeleton/summarycard-skeleton";
@@ -20,6 +21,7 @@ export function Incomes() {
 
   async function fetchIncomesPageData() {
     try {
+      setError(null);
       const response = await api.get("/incomes");
       setData(response.data);
     } catch {
@@ -57,7 +59,7 @@ export function Incomes() {
         <SummaryCardSkeleton />
         <SummaryCardSkeleton />
         <div className="col-span-3">
-          <TableSkeleton />
+          <TableSkeleton showAction />
         </div>
       </div>
     );
@@ -65,9 +67,11 @@ export function Incomes() {
 
   if (error) {
     return (
-      <div className="flex flex-col md:grid md:grid-cols-3 gap-4">
-        <p className="col-span-3">{error}</p>
-      </div>
+      <ErrorCard
+        title="Unable to load income data"
+        message="Please try again later."
+        onRetry={fetchIncomesPageData}
+      />
     );
   }
 

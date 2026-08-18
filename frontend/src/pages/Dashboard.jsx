@@ -1,4 +1,4 @@
-import { useState,useEffect } from "react";
+import { useState, useEffect } from "react";
 import { SummaryCard } from "@/components/cards/SummaryCard";
 import { TableCard } from "@/components/tables/TableCard";
 import { AppCard } from "@/components/cards/Card";
@@ -12,6 +12,8 @@ import { TransactionForm } from "@/components/forms/TransactionForm";
 
 import { SummaryCardSkeleton } from "@/components/skeleton/summarycard-skeleton";
 import { TableSkeleton } from "@/components/skeleton/table-skeleton";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Card, CardHeader } from "@/components/ui/card";
 
 import api from "../api/axios";
 
@@ -111,9 +113,15 @@ export function Dashboard() {
   if (loading) {
     return (
       <div className="flex flex-col md:grid md:grid-cols-3 gap-4">
-        <div className="col-span-3">
-          <SummaryCardSkeleton />
-        </div>
+        <Card className="col-span-3 h-full">
+          <CardHeader>
+            <Skeleton className="h-4 w-1/4" />
+          </CardHeader>
+          <div className="flex gap-2 p-4">
+            <Skeleton className="h-9 w-1/2" />
+            <Skeleton className="h-9 w-1/2" />
+          </div>
+        </Card>
 
         <SummaryCardSkeleton />
         <SummaryCardSkeleton />
@@ -138,6 +146,7 @@ export function Dashboard() {
       <ErrorCard
         title="Unable to load dashboard data"
         message="Please try again later."
+        onRetry={fetchDashboard}
       />
     );
   }

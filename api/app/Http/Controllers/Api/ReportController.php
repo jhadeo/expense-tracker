@@ -72,8 +72,28 @@ class ReportController extends Controller
             ->whereMonth('date', $request->integer('month'))
             ->whereYear('date', $request->integer('year'));
 
-        $income = $incomeQuery->get();
-        $expenses = $expenseQuery->get();
+        $income = $incomeQuery->with('category')->get();
+        $expenses = $expenseQuery->with('category')->get();
+
+        $income = $income->map(function ($income) {
+            return [
+                'id' => $income->id,
+                'title' => $income->title,
+                'amount' => $income->amount,
+                'category' => $income->category->name,
+                'date' => $income->date,
+            ];
+        });
+
+        $expenses = $expenses->map(function ($expense) {
+            return [
+                'id' => $expense->id,
+                'title' => $expense->title,
+                'amount' => $expense->amount,
+                'category' => $expense->category->name,
+                'date' => $expense->date,
+            ];
+        });
 
         $totalIncome = $income->sum('amount');
         $totalExpenses = $expenses->sum('amount');

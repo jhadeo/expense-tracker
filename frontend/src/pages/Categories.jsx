@@ -35,15 +35,20 @@ export function Categories() {
 
   if (error) {
     return (
-      <ErrorCard
+            <ErrorCard
         title="Unable to load categories."
         message="Please try again later."
+        onRetry={fetchCategories}
       />
     );
   }
 
   if (loading) {
-    return <TableSkeleton />;
+    return (
+      <div className="w-full">
+        <TableSkeleton showAction />
+      </div>
+    );
   }
   return (
     <div className="w-full">

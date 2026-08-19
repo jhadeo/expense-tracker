@@ -10,6 +10,7 @@ import {
 import { DialogClose, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "../ui/spinner";
+import { toast } from "sonner";
 
 import { Controller, useForm } from "react-hook-form";
 import { useEffect } from "react";
@@ -18,7 +19,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { handleApiFormError } from "@/lib/utils";
 import api from "@/api/axios";
 
-export function CategoryForm({ onSuccess, onClose, initialData }) {
+export function CategoryForm({ onSuccess, onError, onClose, initialData }) {
   const typeOptions = [
     { label: "Income", value: "income" },
     { label: "Expenses", value: "expenses" },
@@ -56,19 +57,21 @@ export function CategoryForm({ onSuccess, onClose, initialData }) {
         : api.post(endpoint, data);
 
       await request;
+      toast.success(isEditing ? "Category updated." : "Category created.");
       onSuccess?.();
       onClose?.();
       if (!isEditing) {
         reset();
       }
     } catch (error) {
-      handleApiFormError({
+      const result = handleApiFormError({
         error,
         setError,
         defaultMessage: "Category request failed. Please try again.",
         unauthorizedMessage:
           "You are not authorized to complete this transaction. Please relogin to try again.",
       });
+      onError?.(result);
     }
   }
 

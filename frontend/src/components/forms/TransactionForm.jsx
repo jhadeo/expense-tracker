@@ -13,6 +13,7 @@ import {
 import { DialogClose, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "../ui/spinner";
+import { toast } from "sonner";
 
 import { Controller, useForm } from "react-hook-form";
 import { useEffect } from "react";
@@ -91,6 +92,7 @@ export function TransactionForm({
         : api.post(endpoint, data);
 
       await request;
+      toast.success(isEditing ? "Transaction updated." : "Transaction created.");
       onSuccess?.();
       onClose?.();
       if (!isEditing) {
@@ -176,10 +178,7 @@ export function TransactionForm({
 
                     {userCategories?.length > 0 ? (
                       userCategories.map((item) => (
-                        <SelectItem
-                          key={item.value}
-                          value={item.value}
-                        >
+                        <SelectItem key={item.value} value={item.value}>
                           {item.label}
                         </SelectItem>
                       ))

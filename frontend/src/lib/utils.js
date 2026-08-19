@@ -1,5 +1,6 @@
 import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { toast } from "sonner";
 
 export function cn(...inputs) {
   return twMerge(clsx(inputs));
@@ -12,11 +13,19 @@ export function handleApiFormError({
   unauthorizedMessage,
 }) {
   if (error.response?.status === 401) {
+    const message = unauthorizedMessage ?? defaultMessage;
+
     setError("root", {
       type: "server",
-      message: unauthorizedMessage ?? defaultMessage,
+      message,
     });
-    return;
+
+    toast.error(message);
+
+    return {
+      type: "unauthorized",
+      message,
+    };
   }
 
   if (error.response?.status === 422) {
@@ -29,11 +38,21 @@ export function handleApiFormError({
       });
     });
 
-    return;
+    toast.error("Please correct the highlighted fields.");
+
+    return {
+      type: "validation",
+      message: "Please correct the highlighted fields.",
+    };
   }
 
   setError("root", {
     type: "server",
     message: defaultMessage,
   });
+
+  return {
+    type: "error",
+    message: defaultMessage,
+  };
 }

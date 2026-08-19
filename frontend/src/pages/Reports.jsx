@@ -146,7 +146,7 @@ export function Reports() {
   if (isInitialLoading) {
     return (
       <div className="flex flex-col md:grid md:grid-cols-3 gap-4">
-        <Card className="flex flex-row justify-center-safe gap-2 p-4 col-span-3">
+        <Card className="flex flex-row justify-center-safe gap-2 p-4 md:p-6 col-span-3">
           <Skeleton className="h-8 w-40" />
           <Skeleton className="h-8 w-40" />
         </Card>
@@ -186,7 +186,7 @@ export function Reports() {
 
   return (
     <div className="flex flex-col md:grid md:grid-cols-3 gap-4">
-      <Card className="flex flex-row justify-center-safe gap-2 p-4 col-span-3">
+      <Card className="flex flex-row justify-center-safe gap-2 p-4 md:p-6 col-span-3">
         <Select
           value={month.toString()}
           onValueChange={(value) => setMonth(Number(value))}
@@ -242,17 +242,8 @@ export function Reports() {
         color={data?.balance > 0 ? "text-green-600" : "text-red-600"}
       />
 
-      <Card className="col-span-3">
-        <CardTitle className="text-base md:text-2xl text-center m-4">
-          Income vs Expenses
-        </CardTitle>
-        <div className="p-8">
-          <IncomeExpenseChart report={data} />
-        </div>
-      </Card>
-
-      <Card className="col-span-3 p-4">
-        <CardTitle className="text-base md:text-2xl text-center m-4">
+      <Card className="col-span-3 p-4 md:p-6">
+        <CardTitle className="text-base md:text-2xl text-left">
           Your transactions this {monthLabel} {year}
         </CardTitle>
         <div className="flex gap-2">
@@ -282,11 +273,25 @@ export function Reports() {
         <DataTable data={rows} columns={getReportColumns()} />
       </Card>
 
-      <Card className={"col-span-3 p-4"}>
-        <CardTitle className={"text-base md:text-2xl text-center"}>
-          Category Report
+      <Card className="col-span-3 p-4 md:p-6">
+        <CardTitle className="text-base md:text-2xl text-left">
+          Income vs Expenses
         </CardTitle>
-        <div className="flex gap-2 justify-around mt-4">
+        <div className="pt-4">
+          <IncomeExpenseChart report={data} />
+        </div>
+      </Card>
+
+      <Card className="col-span-3 p-4 md:p-6">
+        <div className="flex flex-col gap-4 md:flex-row md:justify-between w-full">
+          <div className="space-y-1 text-center md:text-left">
+            <CardTitle className="text-base md:text-2xl">
+              Category Report
+            </CardTitle>
+            <p className="text-xs md:text-sm text-muted-foreground">
+              Review category performance for {monthLabel} {year}
+            </p>
+          </div>
           <Select
             value={selectedCategory ? selectedCategory.name : undefined}
             onValueChange={(value) => {
@@ -297,7 +302,7 @@ export function Reports() {
               setCategoryId(matchedCategory ? matchedCategory.id : 0);
             }}
           >
-            <SelectTrigger>
+            <SelectTrigger className="bg-muted/20">
               <SelectValue placeholder="Select category" />
             </SelectTrigger>
 
@@ -312,38 +317,71 @@ export function Reports() {
         </div>
 
         {categoryReportLoading ? (
-          <div className="mt-4 space-y-2">
+          <div className="mt-5 space-y-3">
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+              <Skeleton className="h-20 w-full rounded-lg" />
+              <Skeleton className="h-20 w-full rounded-lg" />
+              <Skeleton className="h-20 w-full rounded-lg" />
+            </div>
             <Skeleton className="h-10 w-full" />
             <Skeleton className="h-10 w-full" />
           </div>
         ) : catReport ? (
-          <>
-            <div className="mt-4 space-y-2 text-sm md:text-base">
-              <p>
-                <span className="font-medium">Category:</span>{" "}
-                {catReport.category.name}
-              </p>
-              <p>
-                <span className="font-medium">Type:</span>{" "}
-                {catReport.category.type}
-              </p>
-              <p>
-                <span className="font-medium">
-                  Transactions with {catReport.category.name}:
-                </span>{" "}
-                {catReport.transaction_count}
-              </p>
-              <p>
-                <span className="font-medium">Total Amount:</span> ₱
-                {catReport.total_amount}
-              </p>
+          <div className="mt-5 space-y-4">
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+              <div className="rounded-lg bg-background p-4">
+                <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                  Category
+                </p>
+                <p className="mt-1 text-base font-semibold md:text-lg">
+                  {catReport.category.name}
+                </p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  {catReport.category.type}
+                </p>
+              </div>
+
+              <div className="rounded-lg bg-background p-4">
+                <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                  Transactions
+                </p>
+                <p className="mt-1 text-base font-semibold md:text-lg">
+                  {catReport.transaction_count}
+                </p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Records found for this period
+                </p>
+              </div>
+
+              <div className="rounded-lg bg-background p-4">
+                <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                  Total Amount
+                </p>
+                <p className="mt-1 text-base font-semibold md:text-lg">
+                  ₱{catReport.total_amount}
+                </p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Sum of all category transactions
+                </p>
+              </div>
             </div>
-            <DataTable data={catReport.transactions} columns={getCategoryReportColumns()}/>
-          </>
+
+            <div className="rounded-lg bg-background p-2 md:p-3">
+              <p className="px-2 pb-2 text-sm font-medium text-muted-foreground">
+                Transaction Details
+              </p>
+              <DataTable
+                data={catReport.transactions}
+                columns={getCategoryReportColumns()}
+              />
+            </div>
+          </div>
         ) : (
-          <p className="mt-4 text-center text-sm text-muted-foreground">
-            Select a category to view its report.
-          </p>
+          <div className="mt-5 rounded-lg p-6 text-center">
+            <p className="text-sm text-muted-foreground">
+              Select a category to view its report.
+            </p>
+          </div>
         )}
       </Card>
     </div>

@@ -14,6 +14,7 @@ import {
 import { AppDialog } from "@/components/AppDialog";
 import { TransactionForm } from "./forms/TransactionForm";
 import { deleteResource } from "@/api/transactions";
+import { toast } from "sonner";
 
 export function TransactionActions({
   transaction,
@@ -34,8 +35,10 @@ export function TransactionActions({
       const endpoint = type === "income" ? "/incomes" : "/expenses";
       await deleteResource(endpoint, transaction.id);
       setOpenDelete(false);
+      toast.success("Transaction deleted.")
       onRefresh?.();
     } catch (err) {
+      toast.error("Failed to delete. Please try again.");
       setError(
         err?.response?.data?.message ?? "Failed to delete. Please try again.",
       );

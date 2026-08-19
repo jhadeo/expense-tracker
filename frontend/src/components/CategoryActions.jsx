@@ -14,6 +14,7 @@ import {
 import { AppDialog } from "@/components/AppDialog";
 import { CategoryForm } from "./forms/CategoryForm";
 import { deleteResource } from "@/api/transactions";
+import { toast } from "sonner";
 
 export function CategoryActions({ category, onRefresh, disabled }) {
   const [openDelete, setOpenDelete] = useState(false);
@@ -26,10 +27,12 @@ export function CategoryActions({ category, onRefresh, disabled }) {
     setDeleting(true);
     setError(null);
     try {
-      deleteResource("categories", category.id)
+      await deleteResource("categories", category.id);
+      toast.success("Category deleted.");
       setOpenDelete(false);
       onRefresh?.();
     } catch (err) {
+      toast.error("Failed to delete. Please try again.");
       setError(
         err?.response?.data?.message ?? "Failed to delete. Please try again.",
       );

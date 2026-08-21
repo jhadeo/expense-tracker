@@ -57,20 +57,14 @@ export function Reports() {
     { label: "December", value: 12 },
   ];
 
-  const currentYear = new Date().getFullYear();
   const monthLabel = months.find((item) => item.value === month)?.label;
   const selectedMonthLabel =
     months.find((item) => item.value === month)?.label ?? "Select month";
 
-  const years = Array.from({ length: 6 }, (_, index) => {
-    const year = currentYear - index;
-
-    return {
-      label: year.toString(),
-      value: year,
-    };
-  });
-
+  const years = (data?.years ?? []).map((year) => ({
+    label: year.toString(),
+    value: year,
+  }));
   const selectedYearLabel =
     years.find((item) => item.value === year)?.label ?? "Select year";
 
@@ -216,7 +210,7 @@ export function Reports() {
             </SelectValue>
           </SelectTrigger>
 
-          <SelectContent>
+          <SelectContent className="max-h-60 overflow-y-auto">
             {years.map((year) => (
               <SelectItem key={year.value} value={year.value.toString()}>
                 {year.label}

@@ -29,6 +29,15 @@ class ReportController extends Controller
             ->{$relationship}()
             ->where('category_id', $category->id);
 
+        $years = $request->user()
+            ->{$relationship}()
+            ->where('category_id', $category->id)
+            ->selectRaw("DISTINCT EXTRACT(YEAR FROM date) AS year")
+            ->orderBy('year', 'desc')
+            ->pluck('year')
+            ->map(fn ($year) => (int) $year)
+            ->values();
+
         if ($request->filled('month') && $request->filled('year')) {
             $query->whereMonth('date', $request->integer('month'))
                 ->whereYear('date', $request->integer('year'));
@@ -55,6 +64,7 @@ class ReportController extends Controller
                     'month' => $request->input('month'),
                     'year' => $request->input('year'),
                 ],
+                'years' => $years,
                 'transaction_count' => $transactions->count(),
                 'total_amount' => $transactions->sum('amount'),
                 'transactions' => $transactions,
@@ -64,6 +74,21 @@ class ReportController extends Controller
 
     public function index_monthly(ReportMonthlyRequest $request): JsonResponse
     {
+        $incomeYears = $request->user()->incomes()
+            ->selectRaw("DISTINCT EXTRACT(YEAR FROM date) AS year")
+            ->pluck('year');
+
+        $expenseYears = $request->user()->expenses()
+            ->selectRaw("DISTINCT EXTRACT(YEAR FROM date) AS year")
+            ->pluck('year');
+
+        $years = $incomeYears
+            ->merge($expenseYears)
+            ->map(fn ($year) => (int) $year)
+            ->unique()
+            ->sortDesc()
+            ->values();
+
         $incomeQuery = $request->user()->incomes()
             ->whereMonth('date', $request->integer('month'))
             ->whereYear('date', $request->integer('year'));
@@ -103,6 +128,7 @@ class ReportController extends Controller
             'data' => [
                 'month' => $request->integer('month'),
                 'year' => $request->integer('year'),
+                'years' => $years,
                 'total_income' => $totalIncome,
                 'total_expenses' => $totalExpenses,
                 'balance' => $balance,

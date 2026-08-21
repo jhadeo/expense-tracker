@@ -31,7 +31,7 @@ class ExpenseSeeder extends Seeder
         }
 
         foreach ($users as $user) {
-            $expensesToCreate = random_int(8, 15);
+            $expensesToCreate = 50;
 
             for ($i = 0; $i < $expensesToCreate; $i++) {
                 Expense::factory()->create([

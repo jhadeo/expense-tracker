@@ -31,7 +31,7 @@ class IncomeSeeder extends Seeder
         }
 
         foreach ($users as $user) {
-            $incomesToCreate = random_int(3, 8);
+            $incomesToCreate = 50;
 
             for ($i = 0; $i < $incomesToCreate; $i++) {
                 Income::factory()->create([

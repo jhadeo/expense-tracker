@@ -19,10 +19,12 @@ export function Incomes() {
   const [error, setError] = useState(null);
   const [incomeOpen, setIncomeOpen] = useState(false);
 
-  async function fetchIncomesPageData() {
+  async function fetchIncomesPageData(page = 1) {
     try {
       setError(null);
-      const response = await api.get("/incomes");
+
+      const response = await api.get(`/incomes?page=${page}`);
+
       setData(response.data);
     } catch {
       setError("Unable to load income data. Please try again.");
@@ -52,6 +54,11 @@ export function Incomes() {
       fetchCategories();
     }
   }
+
+  function handlePageChange(page) {
+    fetchIncomesPageData(page);
+  }
+
   if (loading) {
     return (
       <div className="flex flex-col md:grid md:grid-cols-3 gap-4">
@@ -122,6 +129,10 @@ export function Incomes() {
               onRefresh: fetchIncomesPageData,
               categories: categories.data,
             })}
+            serverPagination
+            currentPage={data.meta.current_page}
+            lastPage={data.meta.last_page}
+            onPageChange={handlePageChange}
           />
         </CardContent>
       </Card>

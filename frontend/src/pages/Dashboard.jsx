@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { SummaryCard } from "@/components/cards/SummaryCard";
 import { TableCard } from "@/components/tables/TableCard";
+import { DataTable } from "@/components/tables/DataTable";
+import { getMonthlySummaryColumns } from "@/components/columns/dashboard-monthly";
 import { AppCard } from "@/components/cards/Card";
 import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
@@ -25,9 +27,9 @@ export function Dashboard() {
   const [incomeOpen, setIncomeOpen] = useState(false);
   const [expenseOpen, setExpenseOpen] = useState(false);
 
-  async function fetchDashboard() {
+  async function fetchDashboard(page = 1) {
     try {
-      const response = await api.get("/dashboard");
+      const response = await api.get(`/dashboard?page=${page}`);
 
       setDashboardError(null);
       setData(response.data.data);
@@ -67,6 +69,10 @@ export function Dashboard() {
     }
   }
 
+  function handlePageChange(page) {
+    fetchDashboard(page);
+  }
+
   const recentHeaders = [
     {
       key: "title",
@@ -86,27 +92,6 @@ export function Dashboard() {
           day: "2-digit",
           year: "2-digit",
         }),
-    },
-  ];
-
-  const monthlyHeaders = [
-    {
-      key: "month",
-      label: "Month",
-    },
-    {
-      key: "amount",
-      label: "Amount",
-      render: (row) => (
-        <span
-          className={
-            row.income - row.expenses < 0 ? "text-red-600" : "text-green-600"
-          }
-        >
-          {row.income - row.expenses < 0 ? "-₱" : "+₱"}
-          {Math.abs(row.income - row.expenses)}
-        </span>
-      ),
     },
   ];
 
@@ -232,13 +217,20 @@ export function Dashboard() {
         color="text-red-600"
       />
 
-      <TableCard
+      <AppCard
         title={"Monthly Summary"}
-        rows={data?.monthly_summary}
-        headers={monthlyHeaders}
-        className="row-span-2"
-      />
-
+        className={"row-span-2"}
+        content={
+          <DataTable
+            data={data?.monthly_summary.data}
+            columns={getMonthlySummaryColumns()}
+            serverPagination
+            currentPage={data?.monthly_summary.current_page}
+            lastPage={data?.monthly_summary.last_page}
+            onPageChange={handlePageChange}
+          />
+        }
+      ></AppCard>
       <TableCard
         title={"Recent Incomes"}
         rows={data?.recent_incomes}

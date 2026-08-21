@@ -8,7 +8,7 @@ import {
   createSortedRowModel,
   columnFilteringFeature,
   sortFn_text,
-  sortFn_alphanumeric
+  sortFn_alphanumeric,
 } from "@tanstack/react-table";
 
 import {
@@ -33,7 +33,14 @@ const features = tableFeatures({
   sortFns: { alphanumeric: sortFn_alphanumeric, text: sortFn_text },
 });
 
-export function DataTable({ data, columns }) {
+export function DataTable({
+  data,
+  columns,
+  serverPagination = false,
+  currentPage = 1,
+  lastPage = 1,
+  onPageChange,
+}) {
   const [sorting, setSorting] = useState([]);
 
   const table = useTable({
@@ -83,20 +90,38 @@ export function DataTable({ data, columns }) {
           )}
         </TableBody>
       </Table>
+
       <div className="flex items-center justify-end space-x-2 py-4">
         <Button
           variant="outline"
           size="sm"
-          onClick={() => table.previousPage()}
-          disabled={!table.getCanPreviousPage()}
+          onClick={() =>
+            serverPagination
+              ? onPageChange(currentPage - 1)
+              : table.previousPage()
+          }
+          disabled={
+            serverPagination ? currentPage <= 1 : !table.getCanPreviousPage()
+          }
         >
           Previous
         </Button>
+
+        {serverPagination && (
+          <span className="text-sm">
+            Page {currentPage} of {lastPage}
+          </span>
+        )}
+
         <Button
           variant="outline"
           size="sm"
-          onClick={() => table.nextPage()}
-          disabled={!table.getCanNextPage()}
+          onClick={() =>
+            serverPagination ? onPageChange(currentPage + 1) : table.nextPage()
+          }
+          disabled={
+            serverPagination ? currentPage >= lastPage : !table.getCanNextPage()
+          }
         >
           Next
         </Button>

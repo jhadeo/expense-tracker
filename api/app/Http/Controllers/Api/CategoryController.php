@@ -19,10 +19,9 @@ class CategoryController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $cat = Category::where(function ($query) use ($request) {
-            $query->where('user_id', $request->user()->id)
-                ->orWhereNull('user_id');
-        })->get();
+        $cat = Category::whereNull('user_id')
+            ->orWhere('user_id', $request->user()->id)
+            ->get();
 
         return response()->json([
             "data" => CategoryResource::collection($cat)
